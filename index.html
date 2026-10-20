@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0a0f19">
+  <meta name="theme-color" content="#f4f5f7">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="manifest.webmanifest">
@@ -20,6 +20,12 @@
         <span class="brand-mark">X</span>
         <span><strong>X RANK</strong><small>INK ARCHIVE / SPLATOON 3</small></span>
       </a>
+      <nav id="primary-nav" class="primary-nav" aria-label="メインメニュー">
+        <button type="button" class="nav-button active" data-page-nav="ranking" aria-current="page">ランキング</button>
+        <button type="button" class="nav-button" data-page-nav="alltime">全期間ベスト</button>
+        <button type="button" class="nav-button" data-page-nav="names">過去の名前</button>
+        <button type="button" class="nav-button" data-page-nav="player" disabled>プレイヤー履歴</button>
+      </nav>
       <div class="top-actions">
         <span id="source-status" class="status-pill"><i></i> データ未読込</span>
         <button id="reload-button" class="button button-quiet" type="button">再読込</button>
@@ -27,7 +33,7 @@
     </header>
 
     <main id="top">
-      <section class="hero">
+      <section class="hero page-view" data-page="ranking">
         <div class="hero-copy">
           <p class="eyebrow"><span class="eyebrow-dot"></span> X MATCH / SEASON DATABASE</p>
           <h1>ランキングの軌跡を、<em>ひとつに。</em></h1>
@@ -46,14 +52,14 @@
         </div>
       </section>
 
-      <section class="stat-grid" aria-label="アーカイブ概要">
+      <section class="stat-grid page-view" data-page="ranking" aria-label="アーカイブ概要">
         <article class="stat-card"><span class="stat-label">収録シーズン</span><strong id="stat-seasons">—</strong><span class="stat-foot">Xマッチのみ</span></article>
         <article class="stat-card"><span class="stat-label">収録スナップショット</span><strong id="stat-snapshots">—</strong><span class="stat-foot">Pシーズン・4ルール</span></article>
         <article class="stat-card"><span class="stat-label">プレイヤー識別子</span><strong id="stat-players">—</strong><span class="stat-foot">最新シーズンの掲載分</span></article>
         <article class="stat-card stat-updated"><span class="stat-label">最終データ更新</span><strong id="stat-updated">未取得</strong><span class="stat-foot" id="stat-source">splatoon3.ink</span></article>
       </section>
 
-      <section class="workspace" aria-label="ランキング検索">
+      <section class="workspace page-view" data-page="ranking" aria-label="ランキング検索">
         <aside class="filter-panel">
           <div class="panel-heading"><div><p class="eyebrow">FILTERS</p><h2>ランキング検索</h2></div><span class="filter-icon">⌕</span></div>
           <label class="field-label" for="season-select">シーズン</label>
@@ -89,7 +95,7 @@
         </section>
       </section>
 
-      <section class="alltime-section" aria-label="全期間最高Xパワーランキング">
+      <section class="alltime-section page-view page-hidden" data-page="alltime" aria-label="全期間最高Xパワーランキング">
         <div class="alltime-card">
           <div class="alltime-heading"><div><p class="eyebrow">ALL-TIME PERSONAL BEST</p><h2>全期間最高Xパワーランキング</h2><p class="results-subtitle">公開元に残っているPシーズン全期間のランキングを横断。各ルールはプレイヤーごとの最高記録を500人、総合は各プレイヤーの4ルール中最高XPを1件ずつ採用して1000人表示。</p></div><span id="alltime-updated" class="alltime-updated">集計データ読込待ち</span></div>
           <div id="alltime-tabs" class="alltime-tabs" role="group" aria-label="全期間ランキングの種類">
@@ -105,7 +111,7 @@
         </div>
       </section>
 
-      <section class="past-names-section" aria-label="過去の名前一覧">
+      <section class="past-names-section page-view page-hidden" data-page="names" aria-label="過去の名前一覧">
         <details id="past-names-details" class="past-names-details">
           <summary><span><strong>過去の名前一覧</strong><small>Pシーズンの公開ランキングアーカイブから確認できた名前</small></span><span class="past-names-chevron">＋</span></summary>
           <div class="past-names-content">
@@ -116,14 +122,21 @@
         </details>
       </section>
 
-      <section id="player-panel" class="player-panel hidden" aria-live="polite">
-        <div class="player-panel-head"><div><p class="eyebrow">PLAYER HISTORY</p><h2 id="player-title">プレイヤーの推移</h2><p id="player-meta" class="results-subtitle"></p></div><button id="close-player" class="icon-button" type="button" aria-label="履歴を閉じる">×</button></div>
-        <div class="player-kpis" id="player-kpis"></div>
-        <div class="chart-card"><div class="chart-heading"><div><h3>シーズン別 Xパワー</h3><p>過去シーズンのランキング掲載記録。</p></div><select id="history-rule" class="field-control compact"><option value="splatzones">エリア</option><option value="towercontrol">ヤグラ</option><option value="rainmaker">ホコ</option><option value="clamblitz">アサリ</option></select></div><div id="history-chart" class="history-chart"><div class="chart-empty">プレイヤーを選択してください。</div></div></div>
-        <div class="chart-card archived-history-card"><div class="chart-heading"><div><h3>公開アーカイブの順位・XP推移</h3><p id="archive-history-meta">公開元の全アーカイブから、変化があったPシーズンの順位・XPを読み込みます。</p></div></div><div id="archive-chart" class="history-chart"><div class="chart-empty">プレイヤーを選択してください。</div></div><div class="table-scroll"><table class="history-table"><thead><tr><th>取得日</th><th>シーズン</th><th>順位</th><th>Xパワー</th><th>名前</th><th>ブキ</th></tr></thead><tbody id="archive-history-body"><tr><td colspan="6" class="empty-state">アーカイブ履歴を確認しています。</td></tr></tbody></table></div></div>
-        <div class="chart-card name-history-card"><div class="chart-heading"><div><h3>過去の名前一覧</h3><p>アーカイブ内で同じプレイヤー識別子に紐づいた名前。確認された順に表示します。</p></div></div><div id="player-name-history" class="player-name-history"><div class="chart-empty">名前の履歴を読み込んでいます。</div></div></div>
-        <div class="chart-card hourly-card"><div class="chart-heading"><div><h3>現在シーズンの時間別変化</h3><p id="hourly-meta">クラウド収集後、最新Pシーズンのランキングに変化があった記録を表示します。</p></div></div><div id="hourly-chart" class="history-chart"><div class="chart-empty">時間別の記録を読み込み中…</div></div><div class="table-scroll hourly-table-wrap"><table class="history-table"><thead><tr><th>取得日時</th><th>順位</th><th>Xパワー</th><th>ブキ</th></tr></thead><tbody id="hourly-body"><tr><td colspan="4" class="empty-state">時間別データを確認しています。</td></tr></tbody></table></div></div>
-        <div class="history-table-wrap"><h3>シーズンごとの記録</h3><div class="table-scroll"><table class="history-table"><thead><tr><th>シーズン</th><th>順位</th><th>Xパワー</th><th>順位変動</th><th>ブキ</th></tr></thead><tbody id="history-body"></tbody></table></div></div>
+      <section id="player-panel" class="player-panel hidden page-view page-hidden" data-page="player" aria-live="polite">
+        <div class="player-panel-head"><div><p class="eyebrow">PLAYER HISTORY</p><h2 id="player-title">プレイヤーの推移</h2><p id="player-meta" class="results-subtitle"></p></div><button id="close-player" class="icon-button" type="button" aria-label="履歴を閉じる">戻る</button></div>
+        <nav id="player-subnav" class="player-subnav" aria-label="プレイヤー履歴メニュー">
+          <button type="button" class="player-subnav-button active" data-player-subnav="overview">概要</button>
+          <button type="button" class="player-subnav-button" data-player-subnav="archive">アーカイブ推移</button>
+          <button type="button" class="player-subnav-button" data-player-subnav="names">名前履歴</button>
+          <button type="button" class="player-subnav-button" data-player-subnav="hourly">時間別</button>
+          <button type="button" class="player-subnav-button" data-player-subnav="seasons">シーズン記録</button>
+        </nav>
+        <div class="player-kpis player-view-section" data-player-view="overview" id="player-kpis"></div>
+        <div class="chart-card player-view-section" data-player-view="overview"><div class="chart-heading"><div><h3>シーズン別 Xパワー</h3><p>過去シーズンのランキング掲載記録。</p></div><select id="history-rule" class="field-control compact"><option value="splatzones">エリア</option><option value="towercontrol">ヤグラ</option><option value="rainmaker">ホコ</option><option value="clamblitz">アサリ</option></select></div><div id="history-chart" class="history-chart"><div class="chart-empty">プレイヤーを選択してください。</div></div></div>
+        <div class="chart-card archived-history-card player-view-section player-section-hidden" data-player-view="archive"><div class="chart-heading"><div><h3>公開アーカイブの順位・XP推移</h3><p id="archive-history-meta">公開元の全アーカイブから、変化があったPシーズンの順位・XPを読み込みます。</p></div></div><div id="archive-chart" class="history-chart"><div class="chart-empty">プレイヤーを選択してください。</div></div><div class="table-scroll"><table class="history-table"><thead><tr><th>取得日</th><th>シーズン</th><th>順位</th><th>Xパワー</th><th>名前</th><th>ブキ</th></tr></thead><tbody id="archive-history-body"><tr><td colspan="6" class="empty-state">アーカイブ履歴を確認しています。</td></tr></tbody></table></div></div>
+        <div class="chart-card name-history-card player-view-section player-section-hidden" data-player-view="names"><div class="chart-heading"><div><h3>過去の名前一覧</h3><p>アーカイブ内で同じプレイヤー識別子に紐づいた名前。確認された順に表示します。</p></div></div><div id="player-name-history" class="player-name-history"><div class="chart-empty">名前の履歴を読み込んでいます。</div></div></div>
+        <div class="chart-card hourly-card player-view-section player-section-hidden" data-player-view="hourly"><div class="chart-heading"><div><h3>現在シーズンの時間別変化</h3><p id="hourly-meta">クラウド収集後、最新Pシーズンのランキングに変化があった記録を表示します。</p></div></div><div id="hourly-chart" class="history-chart"><div class="chart-empty">時間別の記録を読み込み中…</div></div><div class="table-scroll hourly-table-wrap"><table class="history-table"><thead><tr><th>取得日時</th><th>順位</th><th>Xパワー</th><th>ブキ</th></tr></thead><tbody id="hourly-body"><tr><td colspan="4" class="empty-state">時間別データを確認しています。</td></tr></tbody></table></div></div>
+        <div class="history-table-wrap player-view-section player-section-hidden" data-player-view="seasons"><h3>シーズンごとの記録</h3><div class="table-scroll"><table class="history-table"><thead><tr><th>シーズン</th><th>順位</th><th>Xパワー</th><th>順位変動</th><th>ブキ</th></tr></thead><tbody id="history-body"></tbody></table></div></div>
       </section>
 
       <footer class="footer"><div class="brand brand-footer"><span class="brand-mark">X</span><span><strong>X RANK ARCHIVE</strong><small>COMMUNITY PROJECT</small></span></div><p>非公式ファンメイドツール。任天堂およびSplatoon 3とは関係ありません。<br>取得できる範囲・項目はデータ提供元の公開状況に依存します。</p></footer>

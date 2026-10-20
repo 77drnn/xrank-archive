@@ -7,7 +7,7 @@
     clamblitz: { ja: 'ガチアサリ', short: 'アサリ' }
   };
   const $ = (id) => document.getElementById(id);
-  const state = { index: null, rows: [], allRows: [], currentPlayer: null, selectedRule: 'splatzones', dataCache: new Map(), loadedRules: new Set(), hourlyIndex: null, nameIndex: null, nameIndexPromise: null, archiveCache: new Map(), pastNameRows: [], pastNamesVisible: 0, pastNamesLoaded: false, allTimeIndex: null, selectedAllTime: 'overall', allTimeRows: [] };
+  const state = { index: null, rows: [], allRows: [], currentPlayer: null, currentPage: 'ranking', previousPage: 'ranking', selectedPlayerSubpage: 'overview', selectedRule: 'splatzones', dataCache: new Map(), loadedRules: new Set(), hourlyIndex: null, nameIndex: null, nameIndexPromise: null, archiveCache: new Map(), pastNameRows: [], pastNamesVisible: 0, pastNamesLoaded: false, allTimeIndex: null, selectedAllTime: 'overall', allTimeRows: [] };
   const seasonOrder = (a, b) => {
     const aa = String(a).match(/^([a-z]+)-(\d+)$/i) || ['', '', '0'];
     const bb = String(b).match(/^([a-z]+)-(\d+)$/i) || ['', '', '0'];
@@ -15,6 +15,17 @@
   };
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const fmt = (n) => n === null || n === undefined || n === '' || !Number.isFinite(Number(n)) ? '—' : Number(n).toLocaleString('ja-JP', {maximumFractionDigits: 1});
+  function seasonLabel(value) {
+    const match = String(value ?? '').match(/^p-(\d+)$/i);
+    if (!match) return String(value ?? '—');
+    const number = Number(match[1]);
+    // P-2 starts in December 2022; each season advances by 3 months.
+    const startIndex = 2022 * 12 + 11 + (number - 2) * 3;
+    const endIndex = startIndex + 3;
+    const sy = Math.floor(startIndex / 12), sm = startIndex % 12 + 1;
+    const ey = Math.floor(endIndex / 12), em = endIndex % 12 + 1;
+    return `${sy}-${sm}～${ey}-${em}`;
+  }
   function setStatus(text, ready = false) {
     const el = $('source-status'); el.textContent = text; el.classList.toggle('ready', ready);
     const dot = document.createElement('i'); el.prepend(dot);
@@ -24,6 +35,39 @@
     const el = document.createElement('div'); el.className = 'toast'; el.textContent = message; document.body.append(el);
     setTimeout(() => el.remove(), 3600);
   }
+  function setActivePage(page, scroll = true) {
+    if (page === 'player' && !state.currentPlayer) return;
+    state.currentPage = page;
+    document.querySelectorAll('.page-view').forEach(view => {
+      view.classList.toggle('page-hidden', view.dataset.page !== page);
+    });
+    document.querySelectorAll('[data-page-nav]').forEach(button => {
+      const active = button.dataset.pageNav === page;
+      button.classList.toggle('active', active);
+      if (active) button.setAttribute('aria-current', 'page');
+      else button.removeAttribute('aria-current');
+      if (button.dataset.pageNav === 'player') button.disabled = !state.currentPlayer;
+    });
+    if (page === 'names') {
+      const details = $('past-names-details');
+      if (details && !details.open) details.open = true;
+    }
+    if (scroll) window.scrollTo({top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+  }
+  function setPlayerSubpage(view, scroll = false) {
+    state.selectedPlayerSubpage = view;
+    document.querySelectorAll('.player-view-section').forEach(section => {
+      section.classList.toggle('player-section-hidden', section.dataset.playerView !== view);
+    });
+    document.querySelectorAll('[data-player-subnav]').forEach(button => {
+      const active = button.dataset.playerSubnav === view;
+      button.classList.toggle('active', active);
+      if (active) button.setAttribute('aria-current', 'page');
+      else button.removeAttribute('aria-current');
+    });
+    if (scroll) $('player-panel').scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start'});
+  }
+
   function rankDiff(value) {
     if (value === null || value === undefined || value === '') return '<span class="diff-value diff-neutral">—</span>';
     const n = Number(value);
@@ -129,7 +173,7 @@
       body.innerHTML='<tr><td colspan="5" class="empty-state">まだ名前履歴がありません。GitHub Actionsで過去アーカイブの取り込みが進むと一覧が増えます。</td></tr>';
     } else {
       body.innerHTML=visible.map(row=>{
-        const contexts=[...(row.seasons||[]).map(x=>String(x).toUpperCase()),...(row.rules||[]).map(x=>RULES[x]?.short || x)];
+        const contexts=[...(row.seasons||[]).map(x=>seasonLabel(x)),...(row.rules||[]).map(x=>RULES[x]?.short || x)];
         return `<tr><td><button class="past-name-open" type="button" data-historical-player-key="${esc(row.key)}">${esc(row.name || '名前不明')}</button></td><td>${esc(row.current || '—')}</td><td>${esc(row.first_seen ? dateLabel(row.first_seen) : '日時不明')}</td><td>${esc(row.last_seen ? dateLabel(row.last_seen) : '日時不明')}</td><td>${esc([...new Set(contexts)].join('・') || '—')}</td></tr>`;
       }).join('');
     }
@@ -215,7 +259,7 @@
       const key = String(p.player_key || '');
       const initials = Array.from(String(p.name || '?')).slice(0,1).join('').toUpperCase();
       const ruleLabel = RULES[p.rule]?.short || '—';
-      const season = p.season ? String(p.season).toUpperCase() : '—';
+      const season = p.season ? seasonLabel(p.season) : '—';
       const observedAt = p.at ? dateLabel(p.at, true) : (p.source === 'season-endpoint' ? '日時未収録' : '—');
       const nameNote = p.name_at_record && p.name_at_record !== p.name ? `<span class="player-small">記録時: ${esc(p.name_at_record)}</span>` : (p.name_id ? `<span class="player-small">ID ${esc(p.name_id)}</span>` : '');
       return `<tr><td>${rankBadge(i+1)}</td><td><button class="player-link" type="button" data-alltime-player-key="${esc(key)}" aria-label="${esc(p.name)} の履歴を表示"><span class="avatar">${esc(initials)}</span><span><span class="player-name">${esc(p.name || '名前不明')}</span>${nameNote}</span></button></td><td><span class="power-value">${fmt(p.x_power)}</span></td><td>${esc(ruleLabel)}</td><td>${esc(season)}</td><td>${p.rank_at_record ? `#${fmt(p.rank_at_record)}` : '—'}</td><td>${esc(observedAt)}</td></tr>`;
@@ -235,7 +279,7 @@
       renderArchiveProgress(index);
       const seasons = [...index.seasons].sort((a,b) => seasonOrder(a.key,b.key));
       state.index.seasons = seasons;
-      $('season-select').innerHTML = seasons.map((s,i)=>`<option value="${esc(s.key)}">${esc(s.label || s.key)}${i === 0 ? '（最新）' : ''}</option>`).join('');
+      $('season-select').innerHTML = seasons.map((s,i)=>`<option value="${esc(s.key)}">${esc(seasonLabel(s.key))}${i === 0 ? '（最新）' : ''}</option>`).join('');
       $('stat-seasons').textContent = fmt(seasons.length);
       $('stat-snapshots').textContent = fmt(seasons.reduce((n,s)=>n+Object.keys(s.rules || {}).length,0));
       $('stat-updated').textContent = index.generated_at ? new Date(index.generated_at).toLocaleString('ja-JP',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '未記録';
@@ -306,12 +350,12 @@
     if (!state.index) return;
     const season = selectedSeason(), rule = state.selectedRule, info = RULES[rule];
     const meta = state.index.seasons.find(s=>s.key===season);
-    $('result-kicker').textContent = `SEASON ${String(season || '').toUpperCase()} / X MATCH`;
-    $('result-title').textContent = `${meta?.label || season || 'ランキング'} · ${info.ja}`;
+    $('result-kicker').textContent = `${seasonLabel(season)} / X MATCH`;
+    $('result-title').textContent = `${seasonLabel(season)} · ${info.ja}`;
     $('result-subtitle').textContent = `収録データ ${meta?.rules?.[rule]?.count ?? '—'} 人 / 出典: splatoon3.ink`;
     const rows = getFilteredRows(); state.rows = rows;
     $('result-count').textContent = fmt(rows.length);
-    $('table-footer-text').textContent = `${season} · ${info.ja} · 表示 ${rows.length.toLocaleString('ja-JP')} 人`;
+    $('table-footer-text').textContent = `${seasonLabel(season)} · ${info.ja} · 表示 ${rows.length.toLocaleString('ja-JP')} 人`;
     if (!rows.length) {
       $('ranking-body').innerHTML = '<tr><td colspan="5" class="empty-state"><span class="empty-glyph">?</span><strong>該当するプレイヤーがいません</strong><p>検索語を変えるか、別のシーズン・ルールを選択してください。</p></td></tr>'; return;
     }
@@ -327,6 +371,7 @@
     return state.allRows.filter(p=>nodeKey(p)===key && p.rule===rule).sort((a,b)=>seasonOrder(a.season,b.season));
   }
   async function showPlayer(key) {
+    if (state.currentPage !== 'player') state.previousPage = state.currentPage || 'ranking';
     const selectedRow = state.rows.find(p => nodeKey(p) === key) || state.allRows.find(p => nodeKey(p) === key) || state.allTimeRows.find(p => nodeKey(p) === key);
     const idx = await loadPlayerNameIndex();
     const nameMeta = idx.players?.[key];
@@ -340,6 +385,8 @@
     $('player-meta').textContent = `ランキング識別子: ${key}${state.currentPlayer.name_id ? ` · nameId: ${state.currentPlayer.name_id}` : ''}`;
     $('history-rule').value = state.selectedRule;
     $('player-panel').classList.remove('hidden');
+    setActivePage('player', false);
+    setPlayerSubpage('overview', false);
     $('history-chart').innerHTML = '<div class="chart-empty">過去シーズンを読み込んでいます…</div>';
     $('archive-chart').innerHTML = '<div class="chart-empty">公開アーカイブを読み込んでいます…</div>';
     $('player-name-history').innerHTML = '<div class="chart-empty">過去の名前を読み込んでいます…</div>';
@@ -362,7 +409,7 @@
       const period=alias.first_seen && alias.last_seen && String(alias.first_seen).slice(0,10)===String(alias.last_seen).slice(0,10)
         ? first
         : `${first} 〜 ${last}`;
-      const seasons=(alias.seasons || []).map(x=>String(x).toUpperCase()).join('・');
+      const seasons=(alias.seasons || []).map(x=>seasonLabel(x)).join('・');
       const rules=(alias.rules || []).map(x=>RULES[x]?.short || x).join('・');
       const extra=[seasons,rules].filter(Boolean).join(' / ');
       return `<div class="player-name-entry"><div><strong>${esc(alias.name || '名前不明')}</strong><span class="name-period">${esc(period)}${extra ? ` · ${esc(extra)}` : ''}</span></div>${alias.name===state.currentPlayer.name?'<span class="name-current">現在表示</span>':''}</div>`;
@@ -417,7 +464,7 @@
     entries.sort((a,b)=>String(a.at || a.date).localeCompare(String(b.at || b.date)));
     $('archive-history-meta').textContent=`${RULES[rule].ja} · 公開アーカイブ内で変化があった時刻付きスナップショット ${entries.length} 件（名前の履歴は全スナップショットから抽出）`;
     drawArchiveChart(entries);
-    body.innerHTML=entries.length ? [...entries].reverse().slice(0,100).map(p=>`<tr><td>${esc(dateLabel(p.at || p.date))}</td><td>${esc(String(p.season || '').toUpperCase())}</td><td>#${fmt(p.rank)}</td><td>${fmt(p.x_power)}</td><td>${esc(p.name || '—')}</td><td>${esc(p.weapon || '—')}</td></tr>`).join('') : '<tr><td colspan="6" class="empty-state">保存済みの日次アーカイブで、このルールの記録が見つかりませんでした。</td></tr>';
+    body.innerHTML=entries.length ? [...entries].reverse().slice(0,100).map(p=>`<tr><td>${esc(dateLabel(p.at || p.date))}</td><td>${esc(seasonLabel(p.season))}</td><td>#${fmt(p.rank)}</td><td>${fmt(p.x_power)}</td><td>${esc(p.name || '—')}</td><td>${esc(p.weapon || '—')}</td></tr>`).join('') : '<tr><td colspan="6" class="empty-state">保存済みの日次アーカイブで、このルールの記録が見つかりませんでした。</td></tr>';
   }
   async function renderPlayerHistory() {
     if (!state.currentPlayer) return;
@@ -433,7 +480,7 @@
       ['掲載シーズン数',fmt(entries.length)],['最新順位',latest ? `#${fmt(latest.rank)}` : '—'],['最高Xパワー',Number.isFinite(bestPower)?fmt(bestPower):'—'],['追跡期間のXP差',powerChange==null?'—':`${powerChange>0?'+':''}${fmt(powerChange)}`]
     ].map(([a,b])=>`<div class="player-kpi"><span>${a}</span><strong>${b}</strong></div>`).join('');
     drawChart(entries);
-    $('history-body').innerHTML = entries.length ? entries.map(p=>`<tr><td>${esc(p.season)}</td><td>#${fmt(p.rank)}</td><td>${fmt(p.x_power)}</td><td>${rankDiff(p.rank_diff)}</td><td>${esc(p.weapon || '—')}</td></tr>`).join('') : '<tr><td colspan="5" class="empty-state">このルールの記録は見つかりません。</td></tr>';
+    $('history-body').innerHTML = entries.length ? entries.map(p=>`<tr><td>${esc(seasonLabel(p.season))}</td><td>#${fmt(p.rank)}</td><td>${fmt(p.x_power)}</td><td>${rankDiff(p.rank_diff)}</td><td>${esc(p.weapon || '—')}</td></tr>`).join('') : '<tr><td colspan="5" class="empty-state">このルールの記録は見つかりません。</td></tr>';
   }
   async function loadHourlyIndex() {
     if (state.hourlyIndex) return state.hourlyIndex;
@@ -477,7 +524,7 @@
       } catch (e) { console.warn('Hourly history could not be loaded', e); }
     }
     entries.sort((a,b)=>String(a.at).localeCompare(String(b.at)));
-    $('hourly-meta').textContent = `${season.toUpperCase()} / ${RULES[rule].ja} · 変化が検出された記録 ${entries.length} 件`;
+    $('hourly-meta').textContent = `${seasonLabel(season)} / ${RULES[rule].ja} · 変化が検出された記録 ${entries.length} 件`;
     drawHourlyChart(entries);
     body.innerHTML = entries.length ? entries.slice(-30).reverse().map(p=>`<tr><td>${esc(new Date(p.at).toLocaleString('ja-JP',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}))}</td><td>#${fmt(p.rank)}</td><td>${fmt(p.x_power)}</td><td>${esc(p.weapon || '—')}</td></tr>`).join('') : '<tr><td colspan="4" class="empty-state">このプレイヤーは現在シーズンの収録済みランキングに見つかりません。</td></tr>';
   }
@@ -488,12 +535,12 @@
     const W=920,H=220,L=48,R=18,T=17,B=39,plotW=W-L-R,plotH=H-T-B;
     const values=usable.map(p=>Number(p.x_power)),min=Math.floor((Math.min(...values)-10)/50)*50,max=Math.ceil((Math.max(...values)+10)/50)*50,span=Math.max(50,max-min);
     const px=i=>L+(i/(usable.length-1))*plotW, py=v=>T+((max-v)/span)*plotH;
-    const grid=[]; for(let j=0;j<=4;j++){const v=min+span*j/4,y=py(v);grid.push(`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#263549" stroke-dasharray="3 5"/><text x="${L-10}" y="${y+4}" text-anchor="end" fill="#75879c" font-size="10">${Math.round(v)}</text>`)}
+    const grid=[]; for(let j=0;j<=4;j++){const v=min+span*j/4,y=py(v);grid.push(`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#d7dce2" stroke-dasharray="3 5"/><text x="${L-10}" y="${y+4}" text-anchor="end" fill="#7b8491" font-size="10">${Math.round(v)}</text>`)}
     const points=usable.map((p,i)=>`${px(i)},${py(Number(p.x_power))}`).join(' ');
     const step=Math.max(1,Math.floor(usable.length/30));
-    const circles=usable.map((p,i)=>i%step===0||i===usable.length-1?`<circle cx="${px(i)}" cy="${py(Number(p.x_power))}" r="3" fill="#c8f36b" stroke="#0c131d" stroke-width="1.5"><title>${esc(new Date(p.at).toLocaleString('ja-JP'))}: ${fmt(p.x_power)} XP · #${fmt(p.rank)}</title></circle>`:'').join('');
+    const circles=usable.map((p,i)=>i%step===0||i===usable.length-1?`<circle cx="${px(i)}" cy="${py(Number(p.x_power))}" r="3" fill="#475569" stroke="#ffffff" stroke-width="1.5"><title>${esc(new Date(p.at).toLocaleString('ja-JP'))}: ${fmt(p.x_power)} XP · #${fmt(p.rank)}</title></circle>`:'').join('');
     const startLabel=new Date(usable[0].at).toLocaleDateString('ja-JP',{month:'2-digit',day:'2-digit'}),endLabel=new Date(usable[usable.length-1].at).toLocaleDateString('ja-JP',{month:'2-digit',day:'2-digit'});
-    host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="時間別Xパワーの推移">${grid.join('')}<polyline points="${points}" fill="none" stroke="#5ae4d0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${circles}<text x="${L}" y="${H-13}" text-anchor="start" fill="#91a1b5" font-size="10">${startLabel}</text><text x="${W-R}" y="${H-13}" text-anchor="end" fill="#91a1b5" font-size="10">${endLabel}</text></svg>`;
+    host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="時間別Xパワーの推移">${grid.join('')}<polyline points="${points}" fill="none" stroke="#475569" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${circles}<text x="${L}" y="${H-13}" text-anchor="start" fill="#667085" font-size="10">${startLabel}</text><text x="${W-R}" y="${H-13}" text-anchor="end" fill="#667085" font-size="10">${endLabel}</text></svg>`;
   }
   function drawArchiveChart(entries) {
     const host=$('archive-chart');
@@ -503,11 +550,11 @@
     const W=920,H=220,L=48,R=18,T=17,B=39,plotW=W-L-R,plotH=H-T-B;
     const values=usable.map(p=>Number(p.x_power)),min=Math.floor((Math.min(...values)-10)/50)*50,max=Math.ceil((Math.max(...values)+10)/50)*50,span=Math.max(50,max-min);
     const px=i=>L+(i/(usable.length-1))*plotW,py=v=>T+((max-v)/span)*plotH;
-    const grid=[];for(let j=0;j<=4;j++){const v=min+span*j/4,y=py(v);grid.push(`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#263549" stroke-dasharray="3 5"/><text x="${L-10}" y="${y+4}" text-anchor="end" fill="#75879c" font-size="10">${Math.round(v)}</text>`)}
+    const grid=[];for(let j=0;j<=4;j++){const v=min+span*j/4,y=py(v);grid.push(`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#d7dce2" stroke-dasharray="3 5"/><text x="${L-10}" y="${y+4}" text-anchor="end" fill="#7b8491" font-size="10">${Math.round(v)}</text>`)}
     const points=usable.map((p,i)=>`${px(i)},${py(Number(p.x_power))}`).join(' '),step=Math.max(1,Math.floor(usable.length/35));
-    const circles=usable.map((p,i)=>i%step===0||i===usable.length-1?`<circle cx="${px(i)}" cy="${py(Number(p.x_power))}" r="3" fill="#c8f36b" stroke="#0c131d" stroke-width="1.5"><title>${esc(dateLabel(p.at||p.date))}: ${fmt(p.x_power)} XP · #${fmt(p.rank)}</title></circle>`:'').join('');
+    const circles=usable.map((p,i)=>i%step===0||i===usable.length-1?`<circle cx="${px(i)}" cy="${py(Number(p.x_power))}" r="3" fill="#475569" stroke="#ffffff" stroke-width="1.5"><title>${esc(dateLabel(p.at||p.date))}: ${fmt(p.x_power)} XP · #${fmt(p.rank)}</title></circle>`:'').join('');
     const first=dateLabel(usable[0].at||usable[0].date),last=dateLabel(usable[usable.length-1].at||usable[usable.length-1].date);
-    host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="公開アーカイブのXパワー推移">${grid.join('')}<polyline points="${points}" fill="none" stroke="#5ae4d0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${circles}<text x="${L}" y="${H-13}" text-anchor="start" fill="#91a1b5" font-size="10">${esc(first)}</text><text x="${W-R}" y="${H-13}" text-anchor="end" fill="#91a1b5" font-size="10">${esc(last)}</text></svg>`;
+    host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="公開アーカイブのXパワー推移">${grid.join('')}<polyline points="${points}" fill="none" stroke="#475569" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${circles}<text x="${L}" y="${H-13}" text-anchor="start" fill="#667085" font-size="10">${esc(first)}</text><text x="${W-R}" y="${H-13}" text-anchor="end" fill="#667085" font-size="10">${esc(last)}</text></svg>`;
   }
   function drawChart(entries) {
     const host = $('history-chart');
@@ -519,12 +566,21 @@
     const px=i=>L+(usable.length===1?plotW/2:(i/(usable.length-1))*plotW);
     const py=v=>T+((max-v)/span)*plotH;
     const grid=[];
-    for(let j=0;j<=4;j++){const v=min+span*j/4,y=py(v);grid.push(`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#263549" stroke-dasharray="3 5"/><text x="${L-10}" y="${y+4}" text-anchor="end" fill="#75879c" font-size="10">${Math.round(v)}</text>`)}
+    for(let j=0;j<=4;j++){const v=min+span*j/4,y=py(v);grid.push(`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#d7dce2" stroke-dasharray="3 5"/><text x="${L-10}" y="${y+4}" text-anchor="end" fill="#7b8491" font-size="10">${Math.round(v)}</text>`)}
     const points=usable.map((p,i)=>`${px(i)},${py(Number(p.x_power))}`).join(' ');
-    const circles=usable.map((p,i)=>`<circle cx="${px(i)}" cy="${py(Number(p.x_power))}" r="4" fill="#c8f36b" stroke="#0c131d" stroke-width="2"><title>${esc(p.season)}: ${fmt(p.x_power)} XP · 順位 ${fmt(p.rank)}</title></circle>`).join('');
-    const labels=usable.map((p,i)=>`<text x="${px(i)}" y="${H-13}" text-anchor="middle" fill="#91a1b5" font-size="10">${esc(p.season)}</text>`).join('');
-    host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Xパワーのシーズン別推移">${grid.join('')}<polyline points="${points}" fill="none" stroke="#5ae4d0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${circles}${labels}</svg>`;
+    const circles=usable.map((p,i)=>`<circle cx="${px(i)}" cy="${py(Number(p.x_power))}" r="4" fill="#475569" stroke="#ffffff" stroke-width="2"><title>${esc(seasonLabel(p.season))}: ${fmt(p.x_power)} XP · 順位 ${fmt(p.rank)}</title></circle>`).join('');
+    const labels=usable.map((p,i)=>`<text x="${px(i)}" y="${H-13}" text-anchor="middle" fill="#667085" font-size="10">${esc(seasonLabel(p.season))}</text>`).join('');
+    host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Xパワーのシーズン別推移">${grid.join('')}<polyline points="${points}" fill="none" stroke="#475569" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${circles}${labels}</svg>`;
   }
+  $('primary-nav').addEventListener('click', e => {
+    const button = e.target.closest('[data-page-nav]');
+    if (!button || button.disabled) return;
+    setActivePage(button.dataset.pageNav);
+  });
+  $('player-subnav').addEventListener('click', e => {
+    const button = e.target.closest('[data-player-subnav]');
+    if (button) setPlayerSubpage(button.dataset.playerSubnav);
+  });
   $('rule-tabs').addEventListener('click', e=>{const b=e.target.closest('[data-rule]');if(!b)return;state.selectedRule=b.dataset.rule;document.querySelectorAll('.rule-button').forEach(x=>x.classList.toggle('active',x===b));renderRanking();});
   $('season-select').addEventListener('change',async()=>{await loadSeasonRows(selectedSeason());updatePlayerCount();renderRanking();});
   $('search-input').addEventListener('input',()=>{renderRanking();clearTimeout(historicalNameSearchTimer);historicalNameSearchTimer=setTimeout(()=>renderHistoricalNameSearch(),220);});
@@ -538,8 +594,10 @@
   $('alltime-tabs').addEventListener('click',e=>{const b=e.target.closest('[data-alltime-view]');if(!b)return;state.selectedAllTime=b.dataset.alltimeView;renderAllTimeRanking();});
   $('alltime-ranking-body').addEventListener('click',e=>{const b=e.target.closest('[data-alltime-player-key]');if(b)showPlayer(b.dataset.alltimePlayerKey);});
   $('history-rule').addEventListener('change',()=>{renderPlayerHistory();renderHourlyHistory();renderArchiveHistory();});
-  $('close-player').addEventListener('click',()=>$('player-panel').classList.add('hidden'));
+  $('close-player').addEventListener('click',()=>setActivePage(state.previousPage || 'ranking'));
   $('reload-button').addEventListener('click',async()=>{state.dataCache.clear();state.loadedRules.clear();state.allRows=[];state.index=null;state.hourlyIndex=null;state.allTimeIndex=null;state.nameIndex=null;state.nameIndexPromise=null;await Promise.all([loadIndex(),loadAllTimeRanking(true)]);toast('ランキングと全期間最高Xパワーを読み直しました。');});
+  setActivePage('ranking', false);
+  setPlayerSubpage('overview', false);
   loadIndex();
   loadAllTimeRanking();
 })();
