@@ -1,0 +1,13 @@
+{
+  "generated_at": null,
+  "source": "https://assets.splatoon3.ink/data/xrank/",
+  "scope": "X Match rankings only; no Splatfest, gear, or schedule data",
+  "latest_season": null,
+  "seasons": [],
+  "failures": [],
+  "archive_days_processed": 0,
+  "archive_days_total": null,
+  "archive_days_remaining": null,
+  "archive_backfill_started": false,
+  "archive_backfill_complete": false
+}
