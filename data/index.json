@@ -1,13 +1,431 @@
 {
-  "generated_at": null,
+  "generated_at": "2026-10-20T17:49:00Z",
   "source": "https://assets.splatoon3.ink/data/xrank/",
   "scope": "X Match rankings only; no Splatfest, gear, or schedule data",
-  "latest_season": null,
-  "seasons": [],
-  "failures": [],
-  "archive_days_processed": 0,
-  "archive_days_total": null,
-  "archive_days_remaining": null,
-  "archive_backfill_started": false,
-  "archive_backfill_complete": false
+  "latest_season": "p-17",
+  "seasons": [
+    {
+      "key": "p-17",
+      "label": "P-17",
+      "rules": {
+        "splatzones": {
+          "url": "data/seasons/p-17/splatzones.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-17.splatzones.json"
+        },
+        "towercontrol": {
+          "url": "data/seasons/p-17/towercontrol.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-17.towercontrol.json"
+        },
+        "rainmaker": {
+          "url": "data/seasons/p-17/rainmaker.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-17.rainmaker.json"
+        },
+        "clamblitz": {
+          "url": "data/seasons/p-17/clamblitz.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-17.clamblitz.json"
+        }
+      }
+    },
+    {
+      "key": "p-16",
+      "label": "P-16",
+      "rules": {
+        "splatzones": {
+          "url": "data/seasons/p-16/splatzones.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-16.splatzones.json"
+        },
+        "towercontrol": {
+          "url": "data/seasons/p-16/towercontrol.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-16.towercontrol.json"
+        },
+        "rainmaker": {
+          "url": "data/seasons/p-16/rainmaker.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-16.rainmaker.json"
+        },
+        "clamblitz": {
+          "url": "data/seasons/p-16/clamblitz.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-16.clamblitz.json"
+        }
+      }
+    },
+    {
+      "key": "p-15",
+      "label": "P-15",
+      "rules": {
+        "splatzones": {
+          "url": "data/seasons/p-15/splatzones.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-15.splatzones.json"
+        },
+        "towercontrol": {
+          "url": "data/seasons/p-15/towercontrol.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-15.towercontrol.json"
+        },
+        "rainmaker": {
+          "url": "data/seasons/p-15/rainmaker.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-15.rainmaker.json"
+        },
+        "clamblitz": {
+          "url": "data/seasons/p-15/clamblitz.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-15.clamblitz.json"
+        }
+      }
+    },
+    {
+      "key": "p-14",
+      "label": "P-14",
+      "rules": {
+        "splatzones": {
+          "url": "data/seasons/p-14/splatzones.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-14.splatzones.json"
+        },
+        "towercontrol": {
+          "url": "data/seasons/p-14/towercontrol.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-14.towercontrol.json"
+        },
+        "rainmaker": {
+          "url": "data/seasons/p-14/rainmaker.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-14.rainmaker.json"
+        },
+        "clamblitz": {
+          "url": "data/seasons/p-14/clamblitz.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-14.clamblitz.json"
+        }
+      }
+    },
+    {
+      "key": "p-13",
+      "label": "P-13",
+      "rules": {
+        "splatzones": {
+          "url": "data/seasons/p-13/splatzones.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-13.splatzones.json"
+        },
+        "towercontrol": {
+          "url": "data/seasons/p-13/towercontrol.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-13.towercontrol.json"
+        },
+        "rainmaker": {
+          "url": "data/seasons/p-13/rainmaker.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-13.rainmaker.json"
+        },
+        "clamblitz": {
+          "url": "data/seasons/p-13/clamblitz.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-13.clamblitz.json"
+        }
+      }
+    },
+    {
+      "key": "p-12",
+      "label": "P-12",
+      "rules": {
+        "splatzones": {
+          "url": "data/seasons/p-12/splatzones.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-12.splatzones.json"
+        },
+        "towercontrol": {
+          "url": "data/seasons/p-12/towercontrol.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-12.towercontrol.json"
+        },
+        "rainmaker": {
+          "url": "data/seasons/p-12/rainmaker.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-12.rainmaker.json"
+        },
+        "clamblitz": {
+          "url": "data/seasons/p-12/clamblitz.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-12.clamblitz.json"
+        }
+      }
+    },
+    {
+      "key": "p-11",
+      "label": "P-11",
+      "rules": {
+        "splatzones": {
+          "url": "data/seasons/p-11/splatzones.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-11.splatzones.json"
+        },
+        "towercontrol": {
+          "url": "data/seasons/p-11/towercontrol.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-11.towercontrol.json"
+        },
+        "rainmaker": {
+          "url": "data/seasons/p-11/rainmaker.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-11.rainmaker.json"
+        },
+        "clamblitz": {
+          "url": "data/seasons/p-11/clamblitz.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-11.clamblitz.json"
+        }
+      }
+    },
+    {
+      "key": "p-10",
+      "label": "P-10",
+      "rules": {
+        "splatzones": {
+          "url": "data/seasons/p-10/splatzones.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-10.splatzones.json"
+        },
+        "towercontrol": {
+          "url": "data/seasons/p-10/towercontrol.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-10.towercontrol.json"
+        },
+        "rainmaker": {
+          "url": "data/seasons/p-10/rainmaker.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-10.rainmaker.json"
+        },
+        "clamblitz": {
+          "url": "data/seasons/p-10/clamblitz.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-10.clamblitz.json"
+        }
+      }
+    },
+    {
+      "key": "p-9",
+      "label": "P-9",
+      "rules": {
+        "splatzones": {
+          "url": "data/seasons/p-9/splatzones.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-9.splatzones.json"
+        },
+        "towercontrol": {
+          "url": "data/seasons/p-9/towercontrol.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-9.towercontrol.json"
+        },
+        "rainmaker": {
+          "url": "data/seasons/p-9/rainmaker.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-9.rainmaker.json"
+        },
+        "clamblitz": {
+          "url": "data/seasons/p-9/clamblitz.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-9.clamblitz.json"
+        }
+      }
+    },
+    {
+      "key": "p-8",
+      "label": "P-8",
+      "rules": {
+        "splatzones": {
+          "url": "data/seasons/p-8/splatzones.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-8.splatzones.json"
+        },
+        "towercontrol": {
+          "url": "data/seasons/p-8/towercontrol.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-8.towercontrol.json"
+        },
+        "rainmaker": {
+          "url": "data/seasons/p-8/rainmaker.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-8.rainmaker.json"
+        },
+        "clamblitz": {
+          "url": "data/seasons/p-8/clamblitz.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-8.clamblitz.json"
+        }
+      }
+    },
+    {
+      "key": "p-7",
+      "label": "P-7",
+      "rules": {
+        "splatzones": {
+          "url": "data/seasons/p-7/splatzones.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-7.splatzones.json"
+        },
+        "towercontrol": {
+          "url": "data/seasons/p-7/towercontrol.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-7.towercontrol.json"
+        },
+        "rainmaker": {
+          "url": "data/seasons/p-7/rainmaker.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-7.rainmaker.json"
+        },
+        "clamblitz": {
+          "url": "data/seasons/p-7/clamblitz.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-7.clamblitz.json"
+        }
+      }
+    },
+    {
+      "key": "p-6",
+      "label": "P-6",
+      "rules": {
+        "splatzones": {
+          "url": "data/seasons/p-6/splatzones.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-6.splatzones.json"
+        },
+        "towercontrol": {
+          "url": "data/seasons/p-6/towercontrol.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-6.towercontrol.json"
+        },
+        "rainmaker": {
+          "url": "data/seasons/p-6/rainmaker.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-6.rainmaker.json"
+        },
+        "clamblitz": {
+          "url": "data/seasons/p-6/clamblitz.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-6.clamblitz.json"
+        }
+      }
+    },
+    {
+      "key": "p-5",
+      "label": "P-5",
+      "rules": {
+        "splatzones": {
+          "url": "data/seasons/p-5/splatzones.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-5.splatzones.json"
+        },
+        "towercontrol": {
+          "url": "data/seasons/p-5/towercontrol.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-5.towercontrol.json"
+        },
+        "rainmaker": {
+          "url": "data/seasons/p-5/rainmaker.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-5.rainmaker.json"
+        },
+        "clamblitz": {
+          "url": "data/seasons/p-5/clamblitz.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-5.clamblitz.json"
+        }
+      }
+    },
+    {
+      "key": "p-4",
+      "label": "P-4",
+      "rules": {
+        "splatzones": {
+          "url": "data/seasons/p-4/splatzones.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-4.splatzones.json"
+        },
+        "towercontrol": {
+          "url": "data/seasons/p-4/towercontrol.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-4.towercontrol.json"
+        },
+        "rainmaker": {
+          "url": "data/seasons/p-4/rainmaker.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-4.rainmaker.json"
+        },
+        "clamblitz": {
+          "url": "data/seasons/p-4/clamblitz.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-4.clamblitz.json"
+        }
+      }
+    },
+    {
+      "key": "p-3",
+      "label": "P-3",
+      "rules": {
+        "splatzones": {
+          "url": "data/seasons/p-3/splatzones.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-3.splatzones.json"
+        },
+        "towercontrol": {
+          "url": "data/seasons/p-3/towercontrol.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-3.towercontrol.json"
+        },
+        "rainmaker": {
+          "url": "data/seasons/p-3/rainmaker.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-3.rainmaker.json"
+        },
+        "clamblitz": {
+          "url": "data/seasons/p-3/clamblitz.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-3.clamblitz.json"
+        }
+      }
+    },
+    {
+      "key": "p-2",
+      "label": "P-2",
+      "rules": {
+        "splatzones": {
+          "url": "data/seasons/p-2/splatzones.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-2.splatzones.json"
+        },
+        "towercontrol": {
+          "url": "data/seasons/p-2/towercontrol.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-2.towercontrol.json"
+        },
+        "rainmaker": {
+          "url": "data/seasons/p-2/rainmaker.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-2.rainmaker.json"
+        },
+        "clamblitz": {
+          "url": "data/seasons/p-2/clamblitz.json",
+          "count": 500,
+          "source_url": "https://assets.splatoon3.ink/data/xrank/xrank.detail.p-2.clamblitz.json"
+        }
+      }
+    }
+  ],
+  "archive_days_processed": 746,
+  "archive_days_total": 1491,
+  "archive_days_remaining": 745,
+  "archive_backfill_started": true,
+  "archive_backfill_complete": false,
+  "archive_latest_day": "2026-10-19",
+  "failures": []
 }
