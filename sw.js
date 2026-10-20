@@ -1,5 +1,5 @@
-const CACHE = 'xrank-shell-v8';
-const SHELL = ['./', './index.html', './style.css?v=8', './app.js?v=8', './manifest.webmanifest', './icon.svg', './icon-180.png', './icon-192.png', './icon-512.png'];
+const CACHE = 'xrank-shell-v9';
+const SHELL = ['./', './index.html', './style.css?v=9', './app.js?v=9', './manifest.webmanifest', './icon.svg', './icon-180.png', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));
 });

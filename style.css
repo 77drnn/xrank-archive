@@ -112,3 +112,69 @@ body{background:#f4f5f7!important;font-size:13px;line-height:1.5}
 }
 @keyframes xrank-view-in { from { opacity: .82; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .page-view:not(.page-hidden) { animation: none; } }
+
+
+/* Readability pass v9 */
+:root {
+  color-scheme: dark;
+  --bg: #10151d;
+  --panel: #19222d;
+  --panel2: #222e3b;
+  --line: #465466;
+  --muted: #c0cad7;
+  --text: #f8fafc;
+  --cyan: #75e2d1;
+  --lime: #d7ed9a;
+  --pink: #ffabc2;
+  --blue: #9fc5ff;
+}
+body {
+  background: #10151d !important;
+  color: #f8fafc !important;
+}
+.hero-art { display: none !important; }
+.hero { min-height: 0; }
+.hero-copy { max-width: 100%; padding-top: 28px; padding-bottom: 26px; }
+.hero-desc { color: #e0e7ef !important; }
+.hero-note, .field-hint, .brand small, .stat-foot,
+.results-subtitle, .table-footer, .alltime-definition,
+.player-meta, .name-period, .status-pill {
+  color: #c0cad7 !important;
+}
+.filter-panel, .results-panel, .stat-card, .alltime-card,
+.player-panel, .chart-card, .source-card, .past-names-details {
+  background-color: #19222d !important;
+  color: #f8fafc !important;
+  border-color: #465466 !important;
+}
+input, select, textarea, .field-control {
+  color: #f8fafc !important;
+  background-color: #222e3b !important;
+  border-color: #58677a !important;
+}
+input::placeholder { color: #c0cad7 !important; opacity: 1; }
+button, .nav-button, .rule-button, .alltime-tab,
+.player-subnav-button, .button-outline, .button-quiet {
+  color: #f8fafc;
+}
+.nav-button.active, .rule-button.active, .alltime-tab.active,
+.player-subnav-button.active {
+  color: #10151d !important;
+  background: #d7ed9a !important;
+  border-color: #d7ed9a !important;
+}
+.rank-table th, .history-table th { color: #e7edf5 !important; }
+.rank-table td, .history-table td { color: #f1f5f9; }
+.rank-table tbody tr:hover, .history-table tbody tr:hover {
+  background-color: #263343 !important;
+}
+a { color: #9fc5ff; }
+.name-search-item { color: #f8fafc !important; background: #222e3b !important; border-color: #465466 !important; }
+.name-search-item small { color: #c0cad7 !important; }
+.empty-state, .chart-empty { color: #d4dce6 !important; }
+@media (max-width: 760px) {
+  .app-shell { padding-left: 14px; padding-right: 14px; }
+  .topbar { height: auto; min-height: 72px; flex-wrap: wrap; gap: 10px; padding: 12px 0; }
+  .top-actions { margin-left: auto; }
+  .hero-copy { padding: 22px 0; }
+}

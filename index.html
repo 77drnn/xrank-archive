@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" href="icon-180.png">
   <meta name="description" content="Splatoon 3 Xマッチランキングのシーズン別アーカイブ・プレイヤー推移検索">
   <title>X RANK ARCHIVE | Splatoon 3</title>
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
   <div class="app-shell">
@@ -23,8 +23,7 @@
       <nav id="primary-nav" class="primary-nav" aria-label="メインメニュー">
         <button type="button" class="nav-button active" data-page-nav="ranking" aria-current="page">ランキング</button>
         <button type="button" class="nav-button" data-page-nav="alltime">全期間ベスト</button>
-        <button type="button" class="nav-button" data-page-nav="names">過去の名前</button>
-        <button type="button" class="nav-button" data-page-nav="player" disabled>プレイヤー履歴</button>
+<button type="button" class="nav-button" data-page-nav="player" disabled>プレイヤー履歴</button>
       </nav>
       <div class="top-actions">
         <span id="source-status" class="status-pill"><i></i> データ未読込</span>
@@ -35,9 +34,9 @@
     <main id="top">
       <section class="hero page-view" data-page="ranking">
         <div class="hero-copy">
-          <p class="eyebrow"><span class="eyebrow-dot"></span> X MATCH / SEASON DATABASE</p>
-          <h1>ランキングの軌跡を、<em>ひとつに。</em></h1>
-          <p class="hero-desc">過去シーズンを横断して、順位・Xパワー・使用ブキの変化を探せる非公式アーカイブ。</p>
+          <p class="eyebrow"><span class="eyebrow-dot"></span> Xマッチランキング</p>
+          <h1>ランキング</h1>
+          <p class="hero-desc">シーズン別の順位・Xパワーを検索できます。</p>
           <div class="hero-note"><span class="note-icon">i</span> 公開ランキングデータを使用。試合履歴や非公開プロフィールは取得しません。</div>
           <div id="archive-progress" class="archive-progress" role="status" aria-live="polite">
             <div class="archive-progress-head"><strong>過去履歴の初期取り込み</strong><span id="archive-progress-count">初回データ取得待ち</span></div>
@@ -75,7 +74,7 @@
           <div class="search-wrap"><span>⌕</span><input id="search-input" class="field-control" type="search" placeholder="名前 / ID で検索" autocomplete="off"></div>
           <p class="field-hint">現在のランキングに加えて、過去の名前でもプレイヤーを探せます。</p><div id="name-search-results" class="name-search-results hidden" aria-live="polite"></div>
           <div class="filter-divider"></div>
-          <div class="toggle-row"><span><strong>上位ランキング</strong><small>表示件数を絞り込む</small></span><select id="limit-select" class="field-control compact"><option value="100">上位100</option><option value="300" selected>上位300</option><option value="1000">全件</option></select></div>
+          <div class="toggle-row"><span><strong>上位ランキング</strong><small>表示件数を絞り込む</small></span><select id="limit-select" class="field-control compact"><option value="100">上位100</option><option value="500" selected>上位500</option><option value="1000">全件</option></select></div>
           <button id="clear-filters" class="button button-outline" type="button">検索条件をリセット</button>
           <div class="source-card"><span class="source-icon">↗</span><div><strong>DATA SOURCE</strong><a href="https://assets.splatoon3.ink/data/xrank/" target="_blank" rel="noreferrer">splatoon3.ink / X Ranking</a></div></div>
         </aside>
@@ -111,17 +110,6 @@
         </div>
       </section>
 
-      <section class="past-names-section page-view page-hidden" data-page="names" aria-label="過去の名前一覧">
-        <details id="past-names-details" class="past-names-details">
-          <summary><span><strong>過去の名前一覧</strong><small>Pシーズンの公開ランキングアーカイブから確認できた名前</small></span><span class="past-names-chevron">＋</span></summary>
-          <div class="past-names-content">
-            <p id="past-names-summary" class="results-subtitle">名前データを読み込むと、確認できた旧名と最終表示名を一覧表示します。</p>
-            <div class="table-scroll"><table class="history-table past-names-table"><thead><tr><th>観測された名前</th><th>最新の表示名</th><th>初回確認</th><th>最終確認</th><th>シーズン / ルール</th></tr></thead><tbody id="past-names-body"><tr><td colspan="5" class="empty-state">一覧を開くと過去の名前を読み込みます。</td></tr></tbody></table></div>
-            <div class="past-names-footer"><span id="past-names-count"></span><button id="past-names-more" class="button button-outline hidden" type="button">さらに100件表示</button></div>
-          </div>
-        </details>
-      </section>
-
       <section id="player-panel" class="player-panel hidden page-view page-hidden" data-page="player" aria-live="polite">
         <div class="player-panel-head"><div><p class="eyebrow">PLAYER HISTORY</p><h2 id="player-title">プレイヤーの推移</h2><p id="player-meta" class="results-subtitle"></p></div><button id="close-player" class="icon-button" type="button" aria-label="履歴を閉じる">戻る</button></div>
         <nav id="player-subnav" class="player-subnav" aria-label="プレイヤー履歴メニュー">
@@ -142,7 +130,7 @@
       <footer class="footer"><div class="brand brand-footer"><span class="brand-mark">X</span><span><strong>X RANK ARCHIVE</strong><small>COMMUNITY PROJECT</small></span></div><p>非公式ファンメイドツール。任天堂およびSplatoon 3とは関係ありません。<br>取得できる範囲・項目はデータ提供元の公開状況に依存します。</p></footer>
     </main>
   </div>
-  <script src="app.js?v=8"></script>
+  <script src="app.js?v=9"></script>
   <script>if ('serviceWorker' in navigator && location.protocol !== 'file:') { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js?v=8').catch(() => {})); }</script>
 </body>
 </html>

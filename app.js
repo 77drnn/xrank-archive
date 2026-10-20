@@ -9,7 +9,7 @@
     clamblitz: { ja: 'ガチアサリ', short: 'アサリ' }
   };
   const $ = (id) => document.getElementById(id);
-  const state = { index: null, rows: [], allRows: [], currentPlayer: null, currentPage: 'ranking', previousPage: 'ranking', selectedPlayerSubpage: 'overview', selectedRule: 'splatzones', dataCache: new Map(), loadedRules: new Set(), hourlyIndex: null, nameIndex: null, nameIndexPromise: null, archiveCache: new Map(), pastNameRows: [], pastNamesVisible: 0, pastNamesLoaded: false, allTimeIndex: null, selectedAllTime: 'overall', allTimeRows: [] };
+  const state = { index: null, rows: [], allRows: [], currentPlayer: null, currentPage: 'ranking', previousPage: 'ranking', selectedPlayerSubpage: 'overview', selectedRule: 'splatzones', dataCache: new Map(), loadedRules: new Set(), hourlyIndex: null, nameIndex: null, nameIndexPromise: null, archiveCache: new Map(), allTimeIndex: null, selectedAllTime: 'overall', allTimeRows: [] };
   const seasonOrder = (a, b) => {
     const aa = String(a).match(/^([a-z]+)-(\d+)$/i) || ['', '', '0'];
     const bb = String(b).match(/^([a-z]+)-(\d+)$/i) || ['', '', '0'];
@@ -57,10 +57,6 @@
       else button.removeAttribute('aria-current');
       if (button.dataset.pageNav === 'player') button.disabled = !state.currentPlayer;
     });
-    if (page === 'names') {
-      const details = $('past-names-details');
-      if (details && !details.open) details.open = true;
-    }
     if (scroll) window.scrollTo({top: 0, behavior: window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
   }
   function setPlayerSubpage(view, scroll = false) {
@@ -348,7 +344,7 @@
   function getFilteredRows() {
     const season = selectedSeason(), rule = state.selectedRule;
     const query = $('search-input').value.trim().toLocaleLowerCase();
-    const limit = Number($('limit-select').value || 300);
+    const limit = Number($('limit-select').value || 500);
     let rows = state.allRows.filter(p => p.season === season && p.rule === rule);
     if (query) rows = rows.filter(p => [p.name,p.id,p.player_key,p.name_id,p.discriminator,p.byname].some(v => String(v ?? '').toLocaleLowerCase().includes(query)));
     rows.sort((a,b)=>Number(a.rank ?? 1e10)-Number(b.rank ?? 1e10));
@@ -597,12 +593,9 @@
   $('season-select').addEventListener('change',async()=>{await loadSeasonRows(selectedSeason());updatePlayerCount();renderRanking();});
   $('search-input').addEventListener('input',()=>{renderRanking();clearTimeout(historicalNameSearchTimer);historicalNameSearchTimer=setTimeout(()=>renderHistoricalNameSearch(),220);});
   $('limit-select').addEventListener('change',renderRanking);
-  $('clear-filters').addEventListener('click',async()=>{$('search-input').value='';$('name-search-results').classList.add('hidden');$('name-search-results').innerHTML='';$('limit-select').value='300';if(state.index)$('season-select').value=state.index.seasons[0]?.key||'';state.selectedRule='splatzones';document.querySelectorAll('.rule-button').forEach(x=>x.classList.toggle('active',x.dataset.rule==='splatzones'));await loadSeasonRows(selectedSeason());updatePlayerCount();renderRanking();});
+  $('clear-filters').addEventListener('click',async()=>{$('search-input').value='';$('name-search-results').classList.add('hidden');$('name-search-results').innerHTML='';$('limit-select').value='500';if(state.index)$('season-select').value=state.index.seasons[0]?.key||'';state.selectedRule='splatzones';document.querySelectorAll('.rule-button').forEach(x=>x.classList.toggle('active',x.dataset.rule==='splatzones'));await loadSeasonRows(selectedSeason());updatePlayerCount();renderRanking();});
   $('ranking-body').addEventListener('click',e=>{const b=e.target.closest('[data-player-key]');if(b)showPlayer(b.dataset.playerKey);});
   $('name-search-results').addEventListener('click',e=>{const b=e.target.closest('[data-historical-player-key]');if(b)showPlayer(b.dataset.historicalPlayerKey);});
-  $('past-names-details').addEventListener('toggle',()=>{if($('past-names-details').open && !state.pastNamesLoaded) renderPastNames(true);});
-  $('past-names-body').addEventListener('click',e=>{const b=e.target.closest('[data-historical-player-key]');if(b)showPlayer(b.dataset.historicalPlayerKey);});
-  $('past-names-more').addEventListener('click',()=>renderPastNames(false));
   $('alltime-tabs').addEventListener('click',e=>{const b=e.target.closest('[data-alltime-view]');if(!b)return;state.selectedAllTime=b.dataset.alltimeView;renderAllTimeRanking();});
   $('alltime-ranking-body').addEventListener('click',e=>{const b=e.target.closest('[data-alltime-player-key]');if(b)showPlayer(b.dataset.alltimePlayerKey);});
   $('history-rule').addEventListener('change',()=>{renderPlayerHistory();renderHourlyHistory();renderArchiveHistory();});
