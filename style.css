@@ -92,3 +92,23 @@ body{background:#f4f5f7!important;font-size:13px;line-height:1.5}
 .page-hidden,.player-section-hidden{display:none!important}
 @media(max-width:950px){.app-shell{padding:0 12px}.topbar{padding:10px 0;gap:8px}.primary-nav{order:3;flex:0 0 100%;width:100%;min-width:0;overflow-x:auto;padding:2px 0 4px}.nav-button{padding:8px 10px}.top-actions{margin-left:auto}.workspace{grid-template-columns:210px minmax(0,1fr)}.hero-art{display:none}}
 @media(max-width:760px){.app-shell{padding-left:max(8px,env(safe-area-inset-left));padding-right:max(8px,env(safe-area-inset-right))}.topbar{align-items:center;min-height:0}.top-actions{gap:5px}.status-pill{max-width:112px;font-size:9px;padding:5px 7px}.brand small{font-size:8px}.primary-nav{gap:4px}.nav-button{flex:1;padding:9px 6px;font-size:11px}.hero{margin-top:8px;padding:0 11px}.hero-copy{padding:11px 0}.hero h1{font-size:22px}.hero-desc{font-size:11px}.stat-grid{gap:6px;margin:8px 0}.stat-card{min-height:60px;padding:8px 9px}.stat-card strong{font-size:19px}.stat-foot{font-size:8px}.workspace{grid-template-columns:1fr;gap:8px}.filter-panel{position:static;padding:11px}.panel-heading{margin-bottom:8px}.panel-heading .eyebrow{margin-bottom:0}.panel-heading h2{font-size:14px}.rule-tabs{margin-bottom:8px}.source-card{display:none}.results-header{padding:11px}.results-header h2{font-size:16px}.rank-table{min-width:610px}.rank-table td,.rank-table th{padding:8px}.alltime-heading{padding:12px}.alltime-heading h2{font-size:16px}.alltime-tabs{padding:0 10px 10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.alltime-tab{justify-content:space-between;padding:8px}.alltime-definition{margin:0 10px 10px}.alltime-table{min-width:800px}.past-names-details>summary{padding:12px}.past-names-content{padding:8px}.past-names-footer{flex-direction:row;align-items:center}.player-panel{padding:10px}.player-subnav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}.player-subnav-button{padding:9px 5px;font-size:10px}.player-panel-head h2{font-size:16px}.player-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.chart-card{padding:10px}.chart-heading{align-items:flex-start}.history-chart svg{height:175px}.footer{flex-direction:column;gap:8px;padding:12px 0}.footer p{text-align:left}.results-panel .table-scroll,.alltime-card .table-scroll,.past-names-content .table-scroll,.player-panel .table-scroll{max-height:calc(100dvh - 215px)}}
+
+
+/* Navigation repair build v8: explicit focus, predictable page switching, and compact mobile menu. */
+:root { color-scheme: light; }
+.nav-button, .player-subnav-button, .alltime-tab, .rule-button { cursor: pointer; }
+.nav-button:focus-visible, .player-subnav-button:focus-visible,
+.alltime-tab:focus-visible, .rule-button:focus-visible,
+.button:focus-visible, .icon-button:focus-visible {
+  outline: 2px solid #475569;
+  outline-offset: 2px;
+}
+.page-view[aria-hidden="true"] { pointer-events: none; }
+.page-view:not(.page-hidden)[aria-hidden="false"] { min-width: 0; }
+@media (max-width: 760px) {
+  .primary-nav { display: flex; flex-wrap: nowrap; scrollbar-width: thin; }
+  .nav-button { flex: 1 0 auto; min-width: max-content; }
+  .page-view:not(.page-hidden) { animation: xrank-view-in 100ms ease-out; }
+}
+@keyframes xrank-view-in { from { opacity: .82; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .page-view:not(.page-hidden) { animation: none; } }

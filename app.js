@@ -1,5 +1,7 @@
 (() => {
   'use strict';
+  // UI navigation repair build v8: explicit page state + delegated menu handling.
+  document.documentElement.dataset.xrankUiBuild = 'v8';
   const RULES = {
     splatzones: { ja: 'ガチエリア', short: 'エリア' },
     towercontrol: { ja: 'ガチヤグラ', short: 'ヤグラ' },
@@ -36,14 +38,21 @@
     setTimeout(() => el.remove(), 3600);
   }
   function setActivePage(page, scroll = true) {
+    const availablePages = new Set(Array.from(document.querySelectorAll('[data-page-nav]'), button => button.dataset.pageNav));
+    if (!availablePages.has(page)) page = 'ranking';
     if (page === 'player' && !state.currentPlayer) return;
+
     state.currentPage = page;
+    document.documentElement.dataset.activePage = page;
     document.querySelectorAll('.page-view').forEach(view => {
-      view.classList.toggle('page-hidden', view.dataset.page !== page);
+      const active = view.dataset.page === page;
+      view.classList.toggle('page-hidden', !active);
+      view.setAttribute('aria-hidden', String(!active));
     });
     document.querySelectorAll('[data-page-nav]').forEach(button => {
       const active = button.dataset.pageNav === page;
       button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', String(active));
       if (active) button.setAttribute('aria-current', 'page');
       else button.removeAttribute('aria-current');
       if (button.dataset.pageNav === 'player') button.disabled = !state.currentPlayer;
@@ -52,7 +61,7 @@
       const details = $('past-names-details');
       if (details && !details.open) details.open = true;
     }
-    if (scroll) window.scrollTo({top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+    if (scroll) window.scrollTo({top: 0, behavior: window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
   }
   function setPlayerSubpage(view, scroll = false) {
     state.selectedPlayerSubpage = view;
@@ -572,9 +581,12 @@
     const labels=usable.map((p,i)=>`<text x="${px(i)}" y="${H-13}" text-anchor="middle" fill="#667085" font-size="10">${esc(seasonLabel(p.season))}</text>`).join('');
     host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Xパワーのシーズン別推移">${grid.join('')}<polyline points="${points}" fill="none" stroke="#475569" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${circles}${labels}</svg>`;
   }
-  $('primary-nav').addEventListener('click', e => {
-    const button = e.target.closest('[data-page-nav]');
+  // Delegate menu clicks at document level so nav controls still work if the
+  // header is re-rendered or the menu is moved by a responsive layout.
+  document.addEventListener('click', e => {
+    const button = e.target instanceof Element ? e.target.closest('[data-page-nav]') : null;
     if (!button || button.disabled) return;
+    e.preventDefault();
     setActivePage(button.dataset.pageNav);
   });
   $('player-subnav').addEventListener('click', e => {
