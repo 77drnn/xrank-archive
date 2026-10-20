@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   // UI navigation repair build v8: explicit page state + delegated menu handling.
-  document.documentElement.dataset.xrankUiBuild = 'v8';
+  document.documentElement.dataset.xrankUiBuild = 'v9';
   const RULES = {
     splatzones: { ja: 'ガチエリア', short: 'エリア' },
     towercontrol: { ja: 'ガチヤグラ', short: 'ヤグラ' },
@@ -9,7 +9,7 @@
     clamblitz: { ja: 'ガチアサリ', short: 'アサリ' }
   };
   const $ = (id) => document.getElementById(id);
-  const state = { index: null, rows: [], allRows: [], currentPlayer: null, currentPage: 'ranking', previousPage: 'ranking', selectedPlayerSubpage: 'overview', selectedRule: 'splatzones', dataCache: new Map(), loadedRules: new Set(), hourlyIndex: null, nameIndex: null, nameIndexPromise: null, archiveCache: new Map(), allTimeIndex: null, selectedAllTime: 'overall', allTimeRows: [] };
+  const state = { index: null, rows: [], allRows: [], currentPlayer: null, currentPage: 'ranking', previousPage: 'ranking', selectedPlayerSubpage: 'overview', selectedRule: 'splatzones', dataCache: new Map(), loadedRules: new Set(), hourlyIndex: null, nameIndex: null, nameIndexPromise: null, archiveCache: new Map(), pastNameRows: [], pastNamesVisible: 0, pastNamesLoaded: false, allTimeIndex: null, selectedAllTime: 'overall', allTimeRows: [] };
   const seasonOrder = (a, b) => {
     const aa = String(a).match(/^([a-z]+)-(\d+)$/i) || ['', '', '0'];
     const bb = String(b).match(/^([a-z]+)-(\d+)$/i) || ['', '', '0'];
@@ -17,6 +17,17 @@
   };
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const fmt = (n) => n === null || n === undefined || n === '' || !Number.isFinite(Number(n)) ? '—' : Number(n).toLocaleString('ja-JP', {maximumFractionDigits: 1});
+
+  // LeannyのSplatoon 3データベースを参照し、英語名を日本語のゲーム内表記に変換する。
+  const WEAPON_NAMES_JA = {".52 Gal": ".52ガロン", ".52 Gallon": ".52ガロン", ".52 Gal Deco": ".52ガロンデコ", ".52 Gallon Deko": ".52ガロンデコ", ".96 Gal": ".96ガロン", ".96 Gallon": ".96ガロン", ".96 Gal Deco": ".96ガロンデコ", ".96 Gallon Deko": ".96ガロンデコ", ".96 Gal Leo": ".96ガロン爪", "Clawz .96 Gal": ".96ガロン爪", "Sploosh-o-matic": "ボールドマーカー", "Neo Sploosh-o-matic": "ボールドマーカーネオ", "Splattershot Jr.": "わかばシューター", "Custom Splattershot Jr.": "もみじシューター", "Splash-o-matic": "シャープマーカー", "Neo Splash-o-matic": "シャープマーカーネオ", "Splash-o-matic GCK-O": "シャープマーカーGECK", "Aerospray MG": "プロモデラーMG", "Aerospray RG": "プロモデラーRG", "Colorz Aerospray": "プロモデラー彩", "Splattershot": "スプラシューター", "Tentatek Splattershot": "スプラシューターコラボ", "Glamorz Splattershot": "スプラシューター煌", "Hero Shot Replica": "ヒーローシューター レプリカ", "Octo Shot Replica": "オクタシューター レプリカ", "Order Shot Replica": "オーダーシューター レプリカ", "Splattershot Nova": "スペースシューター", "Annaki Splattershot Nova": "スペースシューターコラボ", "Splattershot Pro": "プライムシューター", "Forge Splattershot Pro": "プライムシューターコラボ", "Splattershot Pro FRZ-N": "プライムシューターFRZN", "Jet Squelcher": "ジェットスイーパー", "Custom Jet Squelcher": "ジェットスイーパーカスタム", "Jet Squelcher COB-R": "ジェットスイーパーCOBR", "N-ZAP85": "N-ZAP85", "N-ZAP 85": "N-ZAP85", "N-ZAP '85": "N-ZAP85", "N-ZAP89": "N-ZAP89", "N-ZAP '89": "N-ZAP89", "Blaster": "ホットブラスター", "Custom Blaster": "ホットブラスターカスタム", "Range Blaster": "ロングブラスター", "Rapid Blaster": "ラピッドブラスター", "Rapid Blaster Deco": "ラピッドブラスターデコ", "Rapid Blaster Pro": "Rブラスターエリート", "Rapid Blaster Pro Deco": "Rブラスターエリートデコ", "Luna Blaster": "ノヴァブラスター", "Luna Blaster Neo": "ノヴァブラスターネオ", "Clash Blaster": "クラッシュブラスター", "Clash Blaster Neo": "クラッシュブラスターネオ", "S-BLAST 92": "S-BLAST92", "S-BLAST 91": "S-BLAST91", "Splat Roller": "スプラローラー", "Krak-On Splat Roller": "スプラローラーコラボ", "Carbon Roller": "カーボンローラー", "Carbon Roller Deco": "カーボンローラーデコ", "Dynamo Roller": "ダイナモローラー", "Gold Dynamo Roller": "ダイナモローラーテスラ", "Flingza Roller": "ヴァリアブルローラー", "Big Swig Roller": "ワイドローラー", "Big Swig Roller Express": "ワイドローラーコラボ", "Splat Charger": "スプラチャージャー", "Splatterscope": "スプラスコープ", "Firefin Splat Charger": "スプラチャージャーコラボ", "Firefin Splatterscope": "スプラスコープコラボ", "E-liter 4K": "リッター4K", "E-liter 4K Scope": "4Kスコープ", "Custom E-liter 4K": "リッター4Kカスタム", "Custom E-liter 4K Scope": "4Kスコープカスタム", "Bamboozler 14 Mk I": "14式竹筒銃・甲", "Bamboozler 14 Mk II": "14式竹筒銃・乙", "Bamboozler 14 Mk III": "14式竹筒銃・丙", "Goo Tuber": "ソイチューバー", "Custom Goo Tuber": "ソイチューバーカスタム", "Classic Squiffer": "スクイックリンα", "New Squiffer": "スクイックリンβ", "Fresh Squiffer": "スクイックリンγ", "Slosher": "バケットスロッシャー", "Slosher Deco": "バケットスロッシャーデコ", "Tri-Slosher": "ヒッセン", "Tri-Slosher Nouveau": "ヒッセン・ヒュー", "Bloblobber": "オーバーフロッシャー", "Bloblobber Deco": "オーバーフロッシャーデコ", "Explosher": "エクスプロッシャー", "Custom Explosher": "エクスプロッシャーカスタム", "Machine": "バレルスロッシャー", "Sloshing Machine": "スクリュースロッシャー", "Sloshing Machine Neo": "スクリュースロッシャーネオ", "Dread Wringer": "モップリン", "Dread Wringer D": "モップリンD", "Splatling": "スプラスピナー", "Heavy Splatling": "バレルスピナー", "Heavy Splatling Deco": "バレルスピナーデコ", "Hydra Splatling": "ハイドラント", "Ballpoint Splatling": "クーゲルシュライバー", "Nautilus 47": "ノーチラス47", "Nautilus 79": "ノーチラス79", "Mini Splatling": "スプラスピナー", "Zink Mini Splatling": "スプラスピナーコラボ", "Heavy Edit Splatling": "イグザミナー", "Heavy Edit Splatling Nouveau": "イグザミナー・ヒュー", "Dualie Squelchers": "デュアルスイーパー", "Custom Dualie Squelchers": "デュアルスイーパーカスタム", "Splat Dualies": "スプラマニューバー", "Enperry Splat Dualies": "スプラマニューバーコラボ", "Dark Tetra Dualies": "クアッドホッパーブラック", "Light Tetra Dualies": "クアッドホッパーホワイト", "Glooga Dualies": "ケルビン525", "Glooga Dualies Deco": "ケルビン525デコ", "Dapple Dualies": "スパッタリー", "Dapple Dualies Nouveau": "スパッタリー・ヒュー", "Splatana Stamper": "ジムワイパー", "Splatana Stamper Nouveau": "ジムワイパー・ヒュー", "Splatana Wiper": "ドライブワイパー", "Splatana Wiper Deco": "ドライブワイパーデコ", "Mint Decavitator": "デンタルワイパーミント", "Charcoal Decavitator": "デンタルワイパースミ", "Undercover Brella": "スパイガジェット", "Undercover Brella Sorella": "スパイガジェットソレーラ", "Splat Brella": "パラシェルター", "Sorella Brella": "パラシェルターソレーラ", "Tenta Brella": "キャンピングシェルター", "Tenta Sorella Brella": "キャンピングシェルターソレーラ", "Recycled Brella 24 Mk I": "24式張替傘・甲", "Recycled Brella 24 Mk II": "24式張替傘・乙", "Inkbrush": "パブロ", "Octobrush": "ホクサイ", "Octobrush Nouveau": "ホクサイ・ヒュー", "Painbrush": "フィンセント", "Painbrush Nouveau": "フィンセント・ヒュー", "Tri-Stringer": "トライストリンガー", "Inkline Tri-Stringer": "トライストリンガーコラボ", "Wellstring V": "フルイドV", "Custom Wellstring V": "フルイドVカスタム", "Orderbrush Replica": "オーダーブラシ レプリカ", "Order Roller Replica": "オーダーローラー レプリカ", "Order Charger Replica": "オーダーチャージャー レプリカ", "Order Slosher Replica": "オーダースロッシャー レプリカ", "Order Splatling Replica": "オーダースピナー レプリカ", "Order Dualie Replica": "オーダーマニューバー レプリカ", "Order Brella Replica": "オーダーシェルター レプリカ", "Order Stringer Replica": "オーダーストリンガー レプリカ", "Order Splatana Replica": "オーダーワイパー レプリカ", "Squeezer": "ボトルガイザー", "Foil Squeezer": "ボトルガイザーフォイル", "L-3 Nozzlenose": "L3リールガン", "L-3 Nozzlenose D": "L3リールガンD", "H-3 Nozzlenose": "H3リールガン", "H-3 Nozzlenose D": "H3リールガンD", "REEF-LUX 450": "LACT-450", "REEF-LUX 450 Deco": "LACT-450デコ"};
+  const WEAPON_NAMES_JA_NORMALIZED = Object.fromEntries(Object.entries(WEAPON_NAMES_JA).map(([name, ja]) => [name.toLocaleLowerCase('en-US'), ja]));
+  function weaponJa(value) {
+    if (value === null || value === undefined || value === '') return '—';
+    const raw = String(value).trim();
+    if (!raw) return '—';
+    const key = raw.replace(/\s+/g, ' ').replace(/[’‘]/g, String.fromCharCode(39)).toLocaleLowerCase('en-US');
+    return WEAPON_NAMES_JA_NORMALIZED[key] || raw;
+  }
   function seasonLabel(value) {
     const match = String(value ?? '').match(/^p-(\d+)$/i);
     if (!match) return String(value ?? '—');
@@ -154,38 +165,6 @@
       `<button type="button" class="name-search-item" data-historical-player-key="${esc(player.key)}"><strong>${esc(player.name || '名前不明')}</strong><small>一致した名前: ${esc(hit)} · ${esc(player.key)}</small></button>`
     ).join('');
   }
-  async function renderPastNames(reset = false) {
-    if (reset) { state.pastNamesLoaded = false; state.pastNameRows = []; state.pastNamesVisible = 0; }
-    const body = $('past-names-body');
-    if (!state.pastNamesLoaded) {
-      body.innerHTML = '<tr><td colspan="5" class="empty-state">過去の名前を集計中…</td></tr>';
-      const idx = await loadPlayerNameIndex();
-      const rows=[];
-      for (const player of Object.values(idx.players || {})) {
-        for (const alias of (Array.isArray(player.names) ? player.names : [])) {
-          rows.push({key:String(player.key || ''),name:String(alias.name || ''),current:String(player.name || ''),
-            first_seen:alias.first_seen || '',last_seen:alias.last_seen || '',seasons:alias.seasons || [],rules:alias.rules || []});
-        }
-      }
-      rows.sort((a,b)=>String(b.last_seen || '').localeCompare(String(a.last_seen || '')) || String(a.name).localeCompare(String(b.name),'ja'));
-      state.pastNameRows=rows; state.pastNamesLoaded=true;
-      $('past-names-summary').textContent=`公開アーカイブから見つかった名前 ${rows.length.toLocaleString('ja-JP')} 件。名前を選ぶとそのプレイヤーの履歴を開きます。`;
-    }
-    const next=state.pastNamesVisible + 100;
-    state.pastNamesVisible=Math.min(next,state.pastNameRows.length);
-    const visible=state.pastNameRows.slice(0,state.pastNamesVisible);
-    if (!visible.length) {
-      body.innerHTML='<tr><td colspan="5" class="empty-state">まだ名前履歴がありません。GitHub Actionsで過去アーカイブの取り込みが進むと一覧が増えます。</td></tr>';
-    } else {
-      body.innerHTML=visible.map(row=>{
-        const contexts=[...(row.seasons||[]).map(x=>seasonLabel(x)),...(row.rules||[]).map(x=>RULES[x]?.short || x)];
-        return `<tr><td><button class="past-name-open" type="button" data-historical-player-key="${esc(row.key)}">${esc(row.name || '名前不明')}</button></td><td>${esc(row.current || '—')}</td><td>${esc(row.first_seen ? dateLabel(row.first_seen) : '日時不明')}</td><td>${esc(row.last_seen ? dateLabel(row.last_seen) : '日時不明')}</td><td>${esc([...new Set(contexts)].join('・') || '—')}</td></tr>`;
-      }).join('');
-    }
-    $('past-names-count').textContent=`${state.pastNamesVisible.toLocaleString('ja-JP')} / ${state.pastNameRows.length.toLocaleString('ja-JP')} 件を表示`;
-    $('past-names-more').classList.toggle('hidden',state.pastNamesVisible>=state.pastNameRows.length);
-  }
-
   function renderArchiveProgress(index) {
     const banner = $('archive-progress');
     if (!banner) return;
@@ -369,7 +348,7 @@
       const initials = Array.from(String(p.name || '?')).slice(0,1).join('').toUpperCase();
       const byname = typeof p.byname === 'string' ? p.byname : (p.byname?.name || '');
       const secondary = p.name_id ? `ID ${p.name_id}` : byname;
-      return `<tr><td>${rankBadge(rank)}</td><td><button class="player-link" type="button" data-player-key="${esc(key)}" aria-label="${esc(p.name)} の履歴を表示"><span class="avatar">${esc(initials)}</span><span><span class="player-name">${esc(p.name || '名前不明')}</span>${secondary ? `<span class="player-small">${esc(secondary)}</span>` : ''}</span></button></td><td><span class="power-value">${fmt(p.x_power)}</span></td><td>${rankDiff(p.rank_diff)}</td><td><span class="weapon-name">${esc(p.weapon || '—')}</span></td></tr>`;
+      return `<tr><td>${rankBadge(rank)}</td><td><button class="player-link" type="button" data-player-key="${esc(key)}" aria-label="${esc(p.name)} の履歴を表示"><span class="avatar">${esc(initials)}</span><span><span class="player-name">${esc(p.name || '名前不明')}</span>${secondary ? `<span class="player-small">${esc(secondary)}</span>` : ''}</span></button></td><td><span class="power-value">${fmt(p.x_power)}</span></td><td>${rankDiff(p.rank_diff)}</td><td><span class="weapon-name">${esc(weaponJa(p.weapon))}</span></td></tr>`;
     }).join('');
   }
   function allSnapshotsFor(key, rule) {
@@ -469,7 +448,7 @@
     entries.sort((a,b)=>String(a.at || a.date).localeCompare(String(b.at || b.date)));
     $('archive-history-meta').textContent=`${RULES[rule].ja} · 公開アーカイブ内で変化があった時刻付きスナップショット ${entries.length} 件（名前の履歴は全スナップショットから抽出）`;
     drawArchiveChart(entries);
-    body.innerHTML=entries.length ? [...entries].reverse().slice(0,100).map(p=>`<tr><td>${esc(dateLabel(p.at || p.date))}</td><td>${esc(seasonLabel(p.season))}</td><td>#${fmt(p.rank)}</td><td>${fmt(p.x_power)}</td><td>${esc(p.name || '—')}</td><td>${esc(p.weapon || '—')}</td></tr>`).join('') : '<tr><td colspan="6" class="empty-state">保存済みの日次アーカイブで、このルールの記録が見つかりませんでした。</td></tr>';
+    body.innerHTML=entries.length ? [...entries].reverse().slice(0,100).map(p=>`<tr><td>${esc(dateLabel(p.at || p.date))}</td><td>${esc(seasonLabel(p.season))}</td><td>#${fmt(p.rank)}</td><td>${fmt(p.x_power)}</td><td>${esc(p.name || '—')}</td><td>${esc(weaponJa(p.weapon))}</td></tr>`).join('') : '<tr><td colspan="6" class="empty-state">保存済みの日次アーカイブで、このルールの記録が見つかりませんでした。</td></tr>';
   }
   async function renderPlayerHistory() {
     if (!state.currentPlayer) return;
@@ -485,7 +464,7 @@
       ['掲載シーズン数',fmt(entries.length)],['最新順位',latest ? `#${fmt(latest.rank)}` : '—'],['最高Xパワー',Number.isFinite(bestPower)?fmt(bestPower):'—'],['追跡期間のXP差',powerChange==null?'—':`${powerChange>0?'+':''}${fmt(powerChange)}`]
     ].map(([a,b])=>`<div class="player-kpi"><span>${a}</span><strong>${b}</strong></div>`).join('');
     drawChart(entries);
-    $('history-body').innerHTML = entries.length ? entries.map(p=>`<tr><td>${esc(seasonLabel(p.season))}</td><td>#${fmt(p.rank)}</td><td>${fmt(p.x_power)}</td><td>${rankDiff(p.rank_diff)}</td><td>${esc(p.weapon || '—')}</td></tr>`).join('') : '<tr><td colspan="5" class="empty-state">このルールの記録は見つかりません。</td></tr>';
+    $('history-body').innerHTML = entries.length ? entries.map(p=>`<tr><td>${esc(seasonLabel(p.season))}</td><td>#${fmt(p.rank)}</td><td>${fmt(p.x_power)}</td><td>${rankDiff(p.rank_diff)}</td><td>${esc(weaponJa(p.weapon))}</td></tr>`).join('') : '<tr><td colspan="5" class="empty-state">このルールの記録は見つかりません。</td></tr>';
   }
   async function loadHourlyIndex() {
     if (state.hourlyIndex) return state.hourlyIndex;
@@ -531,7 +510,7 @@
     entries.sort((a,b)=>String(a.at).localeCompare(String(b.at)));
     $('hourly-meta').textContent = `${seasonLabel(season)} / ${RULES[rule].ja} · 変化が検出された記録 ${entries.length} 件`;
     drawHourlyChart(entries);
-    body.innerHTML = entries.length ? entries.slice(-30).reverse().map(p=>`<tr><td>${esc(new Date(p.at).toLocaleString('ja-JP',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}))}</td><td>#${fmt(p.rank)}</td><td>${fmt(p.x_power)}</td><td>${esc(p.weapon || '—')}</td></tr>`).join('') : '<tr><td colspan="4" class="empty-state">このプレイヤーは現在シーズンの収録済みランキングに見つかりません。</td></tr>';
+    body.innerHTML = entries.length ? entries.slice(-30).reverse().map(p=>`<tr><td>${esc(new Date(p.at).toLocaleString('ja-JP',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}))}</td><td>#${fmt(p.rank)}</td><td>${fmt(p.x_power)}</td><td>${esc(weaponJa(p.weapon))}</td></tr>`).join('') : '<tr><td colspan="4" class="empty-state">このプレイヤーは現在シーズンの収録済みランキングに見つかりません。</td></tr>';
   }
   function drawHourlyChart(entries) {
     const host = $('hourly-chart');
@@ -600,6 +579,11 @@
   $('alltime-ranking-body').addEventListener('click',e=>{const b=e.target.closest('[data-alltime-player-key]');if(b)showPlayer(b.dataset.alltimePlayerKey);});
   $('history-rule').addEventListener('change',()=>{renderPlayerHistory();renderHourlyHistory();renderArchiveHistory();});
   $('close-player').addEventListener('click',()=>setActivePage(state.previousPage || 'ranking'));
+  $('back-button').addEventListener('click',()=>{
+    if (state.currentPage === 'player') setActivePage(state.previousPage || 'ranking');
+    else if (state.currentPage !== 'ranking') setActivePage('ranking');
+    else toast('すでにランキング画面です。');
+  });
   $('reload-button').addEventListener('click',async()=>{state.dataCache.clear();state.loadedRules.clear();state.allRows=[];state.index=null;state.hourlyIndex=null;state.allTimeIndex=null;state.nameIndex=null;state.nameIndexPromise=null;await Promise.all([loadIndex(),loadAllTimeRanking(true)]);toast('ランキングと全期間最高Xパワーを読み直しました。');});
   setActivePage('ranking', false);
   setPlayerSubpage('overview', false);

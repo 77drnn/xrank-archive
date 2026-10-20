@@ -23,10 +23,11 @@
       <nav id="primary-nav" class="primary-nav" aria-label="メインメニュー">
         <button type="button" class="nav-button active" data-page-nav="ranking" aria-current="page">ランキング</button>
         <button type="button" class="nav-button" data-page-nav="alltime">全期間ベスト</button>
-<button type="button" class="nav-button" data-page-nav="player" disabled>プレイヤー履歴</button>
+        <button type="button" class="nav-button" data-page-nav="player" disabled>プレイヤー履歴</button>
       </nav>
       <div class="top-actions">
         <span id="source-status" class="status-pill"><i></i> データ未読込</span>
+        <button id="back-button" class="button button-quiet back-button" type="button" aria-label="前の画面に戻る">戻る</button>
         <button id="reload-button" class="button button-quiet" type="button">再読込</button>
       </div>
     </header>
@@ -34,9 +35,9 @@
     <main id="top">
       <section class="hero page-view" data-page="ranking">
         <div class="hero-copy">
-          <p class="eyebrow"><span class="eyebrow-dot"></span> Xマッチランキング</p>
-          <h1>ランキング</h1>
-          <p class="hero-desc">シーズン別の順位・Xパワーを検索できます。</p>
+          <p class="eyebrow"><span class="eyebrow-dot"></span> X MATCH / SEASON DATABASE</p>
+          <h1>Xランキング</h1>
+          <p class="hero-desc">シーズン別の順位・Xパワー・ブキを検索できます。</p>
           <div class="hero-note"><span class="note-icon">i</span> 公開ランキングデータを使用。試合履歴や非公開プロフィールは取得しません。</div>
           <div id="archive-progress" class="archive-progress" role="status" aria-live="polite">
             <div class="archive-progress-head"><strong>過去履歴の初期取り込み</strong><span id="archive-progress-count">初回データ取得待ち</span></div>
@@ -110,6 +111,7 @@
         </div>
       </section>
 
+
       <section id="player-panel" class="player-panel hidden page-view page-hidden" data-page="player" aria-live="polite">
         <div class="player-panel-head"><div><p class="eyebrow">PLAYER HISTORY</p><h2 id="player-title">プレイヤーの推移</h2><p id="player-meta" class="results-subtitle"></p></div><button id="close-player" class="icon-button" type="button" aria-label="履歴を閉じる">戻る</button></div>
         <nav id="player-subnav" class="player-subnav" aria-label="プレイヤー履歴メニュー">
@@ -131,6 +133,6 @@
     </main>
   </div>
   <script src="app.js?v=9"></script>
-  <script>if ('serviceWorker' in navigator && location.protocol !== 'file:') { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js?v=8').catch(() => {})); }</script>
+  <script>if ('serviceWorker' in navigator && location.protocol !== 'file:') { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js?v=9').catch(() => {})); }</script>
 </body>
 </html>
