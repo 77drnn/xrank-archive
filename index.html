@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" href="icon-180.png">
   <meta name="description" content="Splatoon 3 Xマッチランキングのシーズン別アーカイブ・プレイヤー推移検索">
   <title>X RANK ARCHIVE | Splatoon 3</title>
-  <link rel="stylesheet" href="style.css?v=9">
+  <link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
   <div class="app-shell">
@@ -23,6 +23,7 @@
       <nav id="primary-nav" class="primary-nav" aria-label="メインメニュー">
         <button type="button" class="nav-button active" data-page-nav="ranking" aria-current="page">ランキング</button>
         <button type="button" class="nav-button" data-page-nav="alltime">全期間ベスト</button>
+        <button type="button" class="nav-button" data-page-nav="weapons">ブキ別ベスト</button>
         <button type="button" class="nav-button" data-page-nav="player" disabled>プレイヤー履歴</button>
       </nav>
       <div class="top-actions">
@@ -112,6 +113,19 @@
       </section>
 
 
+      <section id="weapon-ranking-section" class="alltime-section page-view page-hidden" data-page="weapons" aria-label="ブキ別高Xパワーランキング">
+        <div class="alltime-card">
+          <div class="alltime-heading">
+            <div><p class="eyebrow">WEAPON HIGH POWER</p><h2 id="weapon-ranking-title">ブキ別高Xパワーランキング</h2><p class="results-subtitle">ブキを選ぶと、そのブキの記録でXパワーが高いプレイヤーを表示します。</p></div>
+            <div class="weapon-select-wrap"><div class="weapon-field"><label class="field-label" for="weapon-select">ブキ</label><select id="weapon-select" class="field-control"><option value="">読み込み中…</option></select></div><span id="weapon-ranking-updated" class="alltime-updated">集計データ読込待ち</span></div>
+          </div>
+          <div class="weapon-usage-filter"><label class="field-label" for="weapon-usage-filter">ブキ使用率フィルター <strong id="weapon-usage-value">0.0%以上</strong></label><input id="weapon-usage-filter" type="range" min="0" max="10" step="0.1" value="0" aria-label="ブキ使用率の下限"><div class="weapon-usage-scale"><span>0%</span><span>10%</span></div></div>
+          <p id="weapon-ranking-definition" class="alltime-definition">全期間ベストの取得後に、ブキごとの一覧を表示します。</p>
+          <div class="table-scroll"><table class="rank-table alltime-table"><thead><tr><th class="rank-col">順位</th><th>プレイヤー</th><th class="power-col">X POWER</th><th>記録ルール</th><th>シーズン</th><th>当時順位</th><th>記録日時</th></tr></thead><tbody id="weapon-ranking-body"><tr><td colspan="7" class="empty-state"><strong>ブキ別ランキングを読み込んでいます</strong><p>全期間ベストのデータをもとに一覧を作成します。</p></td></tr></tbody></table></div>
+          <div class="table-footer"><span id="weapon-ranking-footer">出典：splatoon3.ink / PシーズンXランキング</span><span>プレイヤーを選ぶと履歴を表示 <b>↗</b></span></div>
+        </div>
+      </section>
+
       <section id="player-panel" class="player-panel hidden page-view page-hidden" data-page="player" aria-live="polite">
         <div class="player-panel-head"><div><p class="eyebrow">PLAYER HISTORY</p><h2 id="player-title">プレイヤーの推移</h2><p id="player-meta" class="results-subtitle"></p></div><button id="close-player" class="icon-button" type="button" aria-label="履歴を閉じる">戻る</button></div>
         <nav id="player-subnav" class="player-subnav" aria-label="プレイヤー履歴メニュー">
@@ -132,7 +146,7 @@
       <footer class="footer"><div class="brand brand-footer"><span class="brand-mark">X</span><span><strong>X RANK ARCHIVE</strong><small>COMMUNITY PROJECT</small></span></div><p>非公式ファンメイドツール。任天堂およびSplatoon 3とは関係ありません。<br>取得できる範囲・項目はデータ提供元の公開状況に依存します。</p></footer>
     </main>
   </div>
-  <script src="app.js?v=9"></script>
-  <script>if ('serviceWorker' in navigator && location.protocol !== 'file:') { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js?v=9').catch(() => {})); }</script>
+  <script src="app.js?v=10"></script>
+  <script>if ('serviceWorker' in navigator && location.protocol !== 'file:') { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js?v=10').catch(() => {})); }</script>
 </body>
 </html>

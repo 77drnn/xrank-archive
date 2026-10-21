@@ -122,3 +122,16 @@ body{background:#f4f5f7!important;font-size:13px;line-height:1.5}
 .back-button{min-width:58px}
 .top-actions .button{white-space:nowrap}
 @media(max-width:760px){.top-actions{gap:5px}.back-button{padding:8px 10px;min-width:48px}}
+
+
+/* v10: weapon-specific high-power ranking */
+.weapon-select-wrap{display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap;min-width:260px}
+.weapon-field{display:flex;flex-direction:column;gap:4px;min-width:220px}
+.weapon-field .field-label{display:block;margin:0;color:#4b5563;font-weight:700}
+.weapon-field .field-control{width:100%;min-width:220px}
+#weapon-ranking-updated{white-space:nowrap;margin-bottom:1px}
+#weapon-ranking-title{color:#111827}
+@media(max-width:760px){.weapon-select-wrap{width:100%;min-width:0;align-items:stretch;flex-direction:column}.weapon-field,.weapon-field .field-control{min-width:0;width:100%}#weapon-ranking-updated{align-self:flex-start}}
+
+/* Full archive weapon ranking / usage-rate slider */
+.weapon-usage-filter{padding:0 20px 13px;max-width:560px}.weapon-usage-filter .field-label{display:flex;justify-content:space-between;gap:10px;align-items:center}.weapon-usage-filter .field-label strong{color:#1d4ed8;font-size:12px}.weapon-usage-filter input[type=range]{display:block;width:100%;accent-color:#2563eb;margin:10px 0 3px;cursor:pointer}.weapon-usage-scale{display:flex;justify-content:space-between;color:#667085;font-size:10px}.weapon-usage-filter input[type=range]:focus-visible{outline:2px solid #2563eb;outline-offset:3px}@media(max-width:760px){.weapon-usage-filter{padding:0 12px 12px;width:100%;max-width:none}.weapon-usage-filter .field-label{font-size:11px}.weapon-usage-filter .field-label strong{font-size:11px}}

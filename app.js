@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   // UI navigation repair build v8: explicit page state + delegated menu handling.
-  document.documentElement.dataset.xrankUiBuild = 'v9';
+  document.documentElement.dataset.xrankUiBuild = 'v10';
   const RULES = {
     splatzones: { ja: 'ガチエリア', short: 'エリア' },
     towercontrol: { ja: 'ガチヤグラ', short: 'ヤグラ' },
@@ -9,7 +9,7 @@
     clamblitz: { ja: 'ガチアサリ', short: 'アサリ' }
   };
   const $ = (id) => document.getElementById(id);
-  const state = { index: null, rows: [], allRows: [], currentPlayer: null, currentPage: 'ranking', previousPage: 'ranking', selectedPlayerSubpage: 'overview', selectedRule: 'splatzones', dataCache: new Map(), loadedRules: new Set(), hourlyIndex: null, nameIndex: null, nameIndexPromise: null, archiveCache: new Map(), pastNameRows: [], pastNamesVisible: 0, pastNamesLoaded: false, allTimeIndex: null, selectedAllTime: 'overall', allTimeRows: [] };
+  const state = { index: null, rows: [], allRows: [], currentPlayer: null, currentPage: 'ranking', previousPage: 'ranking', selectedPlayerSubpage: 'overview', selectedRule: 'splatzones', dataCache: new Map(), loadedRules: new Set(), hourlyIndex: null, nameIndex: null, nameIndexPromise: null, archiveCache: new Map(), pastNameRows: [], pastNamesVisible: 0, pastNamesLoaded: false, allTimeIndex: null, selectedAllTime: 'overall', allTimeRows: [], selectedWeaponRanking: '', weaponRankingRows: [], weaponArchiveStats: null, weaponArchiveLoadPromise: null, weaponArchiveLoadError: '' };
   const seasonOrder = (a, b) => {
     const aa = String(a).match(/^([a-z]+)-(\d+)$/i) || ['', '', '0'];
     const bb = String(b).match(/^([a-z]+)-(\d+)$/i) || ['', '', '0'];
@@ -27,6 +27,28 @@
     if (!raw) return '—';
     const key = raw.replace(/\s+/g, ' ').replace(/[’‘]/g, String.fromCharCode(39)).toLocaleLowerCase('en-US');
     return WEAPON_NAMES_JA_NORMALIZED[key] || raw;
+  }
+  // 指定されたレプリカ／派生見た目は、ブキ別最高XPでは同じブキとして集計する。
+  const WEAPON_GROUPS = [
+    ['スプラシューター', ['スプラシューター','ヒーローシューター レプリカ','ヒーローシューターレプリカ','オーダーシューター レプリカ','オーダーシューターレプリカ','Hero Shot Replica','Order Shot Replica']],
+    ['スプラシューターコラボ', ['スプラシューターコラボ','オクタシューター レプリカ','オクタシューターレプリカ','PETシューターレプリカ','Tentatek Splattershot','Octo Shot Replica','PET Shooter Replica']],
+    ['スプラローラー', ['スプラローラー','オーダーローラー レプリカ','オーダーローラーレプリカ','Splat Roller','Order Roller Replica']],
+    ['スプラチャージャー', ['スプラチャージャー','オーダーチャージャー レプリカ','オーダーチャージャーレプリカ','Splat Charger','Order Charger Replica']],
+    ['スプラマニューバー', ['スプラマニューバー','オーダーマニューバー レプリカ','オーダーマニューバーレプリカ','Splat Dualies','Order Dualie Replica']],
+    ['パラシェルター', ['パラシェルター','オーダーシェルター レプリカ','オーダーシェルターレプリカ','Splat Brella','Order Brella Replica']],
+    ['トライストリンガー', ['トライストリンガー','オーダーストリンガー レプリカ','オーダーストリンガーレプリカ','Tri-Stringer','Order Stringer Replica']],
+    ['ジムワイパー', ['ジムワイパー','オーダーワイパー レプリカ','オーダーワイパーレプリカ','Splatana Stamper','Order Splatana Replica']],
+    ['バケットスロッシャー', ['バケットスロッシャー','オーダースロッシャー レプリカ','オーダースロッシャーレプリカ','Slosher','Order Slosher Replica']],
+    ['ノヴァブラスター', ['ノヴァブラスター','オーダーブラスター レプリカ','オーダーブラスターレプリカ','Luna Blaster','Order Blaster Replica']],
+    ['ホクサイ', ['ホクサイ','オーダーブラシ レプリカ','オーダーブラシレプリカ','Octobrush','Orderbrush Replica']],
+    ['バレルスピナー', ['バレルスピナー','オーダースピナー レプリカ','オーダースピナーレプリカ','Heavy Splatling','Order Splatling Replica']]
+  ];
+  const WEAPON_GROUP_LOOKUP = new Map();
+  const weaponKey = value => String(value ?? '').trim().replace(/\s+/g, ' ').toLocaleLowerCase('en-US');
+  for (const [canonical, aliases] of WEAPON_GROUPS) for (const alias of aliases) WEAPON_GROUP_LOOKUP.set(weaponKey(alias), canonical);
+  function canonicalWeapon(value) {
+    const ja = weaponJa(value);
+    return WEAPON_GROUP_LOOKUP.get(weaponKey(ja)) || WEAPON_GROUP_LOOKUP.get(weaponKey(value)) || ja;
   }
   function seasonLabel(value) {
     const match = String(value ?? '').match(/^p-(\d+)$/i);
@@ -250,6 +272,146 @@
     }).join('');
     const total = Number(group?.total_players || rows.length);
     $('alltime-footer').textContent = `${headerName} · ${rows.length.toLocaleString('ja-JP')} / ${Math.min(maxLabel,total).toLocaleString('ja-JP')} 件表示 · 全対象 ${total.toLocaleString('ja-JP')} 人`;
+  }
+
+  // 全アーカイブの月別・プレイヤーシャードを走査し、ブキ別最高XPと使用率を集計する。
+  async function loadAllArchiveWeaponRanking() {
+    if (state.weaponArchiveStats) return state.weaponArchiveStats;
+    if (state.weaponArchiveLoadPromise) return state.weaponArchiveLoadPromise;
+    state.weaponArchiveLoadError = '';
+    state.weaponArchiveLoadPromise = (async () => {
+      const body = $('weapon-ranking-body');
+      const status = $('weapon-ranking-updated');
+      const nameIndex = await loadPlayerNameIndex();
+      const players = Object.entries(nameIndex.players || {});
+      if (!players.length) throw new Error('player-names-index.json にアーカイブ索引がありません');
+      const files = new Set();
+      for (const [mapKey, player] of players) {
+        const key = String(player.key || mapKey);
+        const shard = String(playerHistoryShard(key)).padStart(2, '0');
+        for (const [season, rules] of Object.entries(player.history_months || {})) {
+          for (const [rule, months] of Object.entries(rules || {})) {
+            if (!RULES[rule] || !Array.isArray(months)) continue;
+            for (const month of months) files.add(`data/archive-history/${encodeURIComponent(season)}/${encodeURIComponent(rule)}/${encodeURIComponent(month)}-s${shard}.jsonl`);
+          }
+        }
+      }
+      const paths = [...files];
+      if (!paths.length) throw new Error('全アーカイブの月別ファイルが索引に見つかりません');
+      const best = new Map();
+      const usage = new Map();
+      let totalRows = 0, completed = 0, failed = 0;
+      const concurrency = 8;
+      if (body) body.innerHTML = `<tr><td colspan="7" class="empty-state">全アーカイブを読み込んでいます… 0 / ${paths.length.toLocaleString('ja-JP')} ファイル</td></tr>`;
+      if (status) status.textContent = `全アーカイブ準備中 · ${paths.length.toLocaleString('ja-JP')}ファイル`;
+      const processFile = async path => {
+        try {
+          const res = await fetch(`${path}?ts=${Date.now()}`, {cache:'no-store'});
+          if (!res.ok) { if (res.status !== 404) failed++; return; }
+          const text = await res.text();
+          for (const line of text.split(/\r?\n/)) {
+            if (!line.trim()) continue;
+            let day;
+            try { day = JSON.parse(line); } catch { continue; }
+            const season = day.season || path.match(/archive-history\/([^/]+)/)?.[1] || '';
+            const rule = day.rule || path.match(/archive-history\/[^/]+\/([^/]+)/)?.[1] || '';
+            if (!RULES[rule]) continue;
+            for (const event of (day.events || [])) {
+              if (!Array.isArray(event) || event.length < 5) continue;
+              const playerKey = String(event[1] ?? '');
+              const rawWeapon = event[5];
+              const power = Number(event[4]);
+              if (!playerKey || rawWeapon == null || rawWeapon === '' || !Number.isFinite(power)) continue;
+              const weapon = canonicalWeapon(rawWeapon);
+              totalRows++;
+              usage.set(weapon, (usage.get(weapon) || 0) + 1);
+              const candidate = { player_key:playerKey, name:String(event[2] ?? '名前不明'), rank:event[3], x_power:power, weapon_label:weapon, name_id:event[6], rule, season, at:event[0], date:day.date, source:'archive' };
+              const key = `${playerKey}\u0000${weapon}`;
+              const old = best.get(key);
+              const oldRank = Number(old?.rank ?? Infinity), newRank = Number(candidate.rank ?? Infinity);
+              if (!old || power > old.x_power || (power === old.x_power && newRank < oldRank)) best.set(key, candidate);
+            }
+          }
+        } catch (e) { failed++; console.warn('Weapon archive file failed', path, e); }
+      };
+      for (let i=0; i<paths.length; i+=concurrency) {
+        await Promise.all(paths.slice(i, i+concurrency).map(processFile));
+        completed = Math.min(i + concurrency, paths.length);
+        if (status) status.textContent = `全アーカイブ取得 ${completed.toLocaleString('ja-JP')} / ${paths.length.toLocaleString('ja-JP')}`;
+        if (body) body.innerHTML = `<tr><td colspan="7" class="empty-state">全アーカイブを集計中… ${completed.toLocaleString('ja-JP')} / ${paths.length.toLocaleString('ja-JP')} ファイル</td></tr>`;
+      }
+      if (!best.size) throw new Error('アーカイブ内にブキとXパワーが揃った記録がありません');
+      state.weaponArchiveStats = { rows:[...best.values()], usage, totalRows, filesTotal:paths.length, filesFailed:failed, generatedAt:new Date().toISOString() };
+      return state.weaponArchiveStats;
+    })().catch(error => {
+      state.weaponArchiveLoadError = error?.message || String(error);
+      state.weaponArchiveLoadPromise = null;
+      throw error;
+    });
+    return state.weaponArchiveLoadPromise;
+  }
+
+  function renderWeaponRanking() {
+    const body = $('weapon-ranking-body');
+    const select = $('weapon-select');
+    const slider = $('weapon-usage-filter');
+    if (!body || !select) return;
+    const stats = state.weaponArchiveStats;
+    if (!stats) {
+      if (state.weaponArchiveLoadError) {
+        body.innerHTML = `<tr><td colspan="7" class="empty-state">全アーカイブを読み込めませんでした。${esc(state.weaponArchiveLoadError)}。公開データのパスと player-names-index.json を確認してください。</td></tr>`;
+        $('weapon-ranking-updated').textContent = '読み込み失敗';
+        $('weapon-ranking-footer').textContent = 'データを確認してください';
+      } else {
+        body.innerHTML = '<tr><td colspan="7" class="empty-state">ブキ別ランキングの初回読み込みを待っています。</td></tr>';
+      }
+      return;
+    }
+    state.weaponRankingRows = stats.rows;
+    const threshold = Number(slider?.value || 0);
+    if ($('weapon-usage-value')) $('weapon-usage-value').textContent = `${threshold.toFixed(1)}%以上`;
+    const byWeapon = new Map();
+    for (const row of stats.rows) {
+      if (!byWeapon.has(row.weapon_label)) byWeapon.set(row.weapon_label, []);
+      byWeapon.get(row.weapon_label).push(row);
+    }
+    const weapons = [...byWeapon.entries()].map(([weapon, rows]) => ({weapon, rows, count:stats.usage.get(weapon) || 0, rate:stats.totalRows ? (stats.usage.get(weapon) || 0) / stats.totalRows * 100 : 0}))
+      .sort((a,b) => b.rate-a.rate || b.rows.length-a.rows.length || a.weapon.localeCompare(b.weapon,'ja'));
+    const filtered = weapons.filter(item => item.rate + 1e-9 >= threshold);
+    if (!filtered.length) {
+      select.innerHTML = '<option value="">条件に合うブキなし</option>';
+      state.selectedWeaponRanking = '';
+      body.innerHTML = '<tr><td colspan="7" class="empty-state">この使用率以上のブキはありません。スライダーを左に動かしてください。</td></tr>';
+      $('weapon-ranking-title').textContent = 'ブキ別高Xパワーランキング';
+      $('weapon-ranking-updated').textContent = `全アーカイブ ${stats.filesTotal.toLocaleString('ja-JP')}ファイル`;
+      $('weapon-ranking-definition').textContent = `使用率は、全アーカイブでブキが記録された行数 ÷ ブキ情報付き記録の総数。フィルター条件 ${threshold.toFixed(1)}%以上。`;
+      $('weapon-ranking-footer').textContent = '条件に合うブキ 0件';
+      return;
+    }
+    const wanted = state.selectedWeaponRanking || select.value;
+    select.innerHTML = filtered.map(item => `<option value="${esc(item.weapon)}">${esc(item.weapon)} · ${item.rate.toFixed(2)}% · ${item.rows.length.toLocaleString('ja-JP')}人</option>`).join('');
+    state.selectedWeaponRanking = filtered.some(item => item.weapon === wanted) ? wanted : filtered[0].weapon;
+    select.value = state.selectedWeaponRanking;
+    const selected = filtered.find(item => item.weapon === state.selectedWeaponRanking);
+    const rows = [...(selected?.rows || [])].sort((a,b) => Number(b.x_power)-Number(a.x_power) || Number(a.rank ?? Infinity)-Number(b.rank ?? Infinity) || String(a.player_key).localeCompare(String(b.player_key)));
+    $('weapon-ranking-title').textContent = `${state.selectedWeaponRanking} · 高Xパワーランキング`;
+    $('weapon-ranking-updated').textContent = `全アーカイブ ${stats.filesTotal.toLocaleString('ja-JP')}ファイル`;
+    $('weapon-ranking-definition').textContent = `全アーカイブの記録を走査。表示中ブキの使用率 ${selected.rate.toFixed(2)}%（${selected.count.toLocaleString('ja-JP')}行 / 全${stats.totalRows.toLocaleString('ja-JP')}行）。使用率フィルターはブキ一覧に適用。レプリカ等の指定された組み合わせは同一ブキとして集計。${stats.filesFailed ? ` 読み込みに失敗したファイル: ${stats.filesFailed.toLocaleString('ja-JP')}件。` : ''}`;
+    if (!rows.length) {
+      body.innerHTML = '<tr><td colspan="7" class="empty-state">このブキの記録はありません。</td></tr>';
+      $('weapon-ranking-footer').textContent = `${state.selectedWeaponRanking} · 0人`;
+      return;
+    }
+    body.innerHTML = rows.map((p,i) => {
+      const key = String(p.player_key || '');
+      const initials = Array.from(String(p.name || '?')).slice(0,1).join('').toUpperCase();
+      const note = p.name_id ? `<span class="player-small">ID ${esc(p.name_id)}</span>` : '';
+      const rule = RULES[p.rule]?.short || '—';
+      const season = p.season ? seasonLabel(p.season) : '—';
+      const at = p.at ? dateLabel(p.at,true) : (p.date ? dateLabel(p.date) : '—');
+      return `<tr><td>${rankBadge(i+1)}</td><td><button class="player-link" type="button" data-weapon-player-key="${esc(key)}" aria-label="${esc(p.name || '名前不明')} の履歴を表示"><span class="avatar">${esc(initials)}</span><span><span class="player-name">${esc(p.name || '名前不明')}</span>${note}</span></button></td><td><span class="power-value">${fmt(p.x_power)}</span></td><td>${esc(rule)}</td><td>${esc(season)}</td><td>${p.rank != null ? `#${fmt(p.rank)}` : '—'}</td><td>${esc(at)}</td></tr>`;
+    }).join('');
+    $('weapon-ranking-footer').textContent = `${state.selectedWeaponRanking} · ${rows.length.toLocaleString('ja-JP')}人 · 使用率 ${selected.rate.toFixed(2)}%`;
   }
 
   async function loadIndex() {
@@ -563,6 +725,7 @@
     if (!button || button.disabled) return;
     e.preventDefault();
     setActivePage(button.dataset.pageNav);
+    if (button.dataset.pageNav === 'weapons') loadAllArchiveWeaponRanking().then(renderWeaponRanking).catch(error => { console.warn(error); renderWeaponRanking(); });
   });
   $('player-subnav').addEventListener('click', e => {
     const button = e.target.closest('[data-player-subnav]');
@@ -577,6 +740,9 @@
   $('name-search-results').addEventListener('click',e=>{const b=e.target.closest('[data-historical-player-key]');if(b)showPlayer(b.dataset.historicalPlayerKey);});
   $('alltime-tabs').addEventListener('click',e=>{const b=e.target.closest('[data-alltime-view]');if(!b)return;state.selectedAllTime=b.dataset.alltimeView;renderAllTimeRanking();});
   $('alltime-ranking-body').addEventListener('click',e=>{const b=e.target.closest('[data-alltime-player-key]');if(b)showPlayer(b.dataset.alltimePlayerKey);});
+  $('weapon-select').addEventListener('change', () => { state.selectedWeaponRanking = $('weapon-select').value; renderWeaponRanking(); });
+  $('weapon-usage-filter').addEventListener('input', renderWeaponRanking);
+  $('weapon-ranking-body').addEventListener('click', e => { const b=e.target.closest('[data-weapon-player-key]'); if(b) showPlayer(b.dataset.weaponPlayerKey); });
   $('history-rule').addEventListener('change',()=>{renderPlayerHistory();renderHourlyHistory();renderArchiveHistory();});
   $('close-player').addEventListener('click',()=>setActivePage(state.previousPage || 'ranking'));
   $('back-button').addEventListener('click',()=>{
@@ -584,7 +750,7 @@
     else if (state.currentPage !== 'ranking') setActivePage('ranking');
     else toast('すでにランキング画面です。');
   });
-  $('reload-button').addEventListener('click',async()=>{state.dataCache.clear();state.loadedRules.clear();state.allRows=[];state.index=null;state.hourlyIndex=null;state.allTimeIndex=null;state.nameIndex=null;state.nameIndexPromise=null;await Promise.all([loadIndex(),loadAllTimeRanking(true)]);toast('ランキングと全期間最高Xパワーを読み直しました。');});
+  $('reload-button').addEventListener('click',async()=>{state.dataCache.clear();state.loadedRules.clear();state.allRows=[];state.index=null;state.hourlyIndex=null;state.allTimeIndex=null;state.nameIndex=null;state.nameIndexPromise=null;state.weaponRankingRows=[];state.weaponArchiveStats=null;state.weaponArchiveLoadPromise=null;state.weaponArchiveLoadError='';await Promise.all([loadIndex(),loadAllTimeRanking(true)]);if(state.currentPage==='weapons')loadAllArchiveWeaponRanking().then(renderWeaponRanking).catch(()=>renderWeaponRanking());toast('ランキングと全期間最高Xパワーを読み直しました。');});
   setActivePage('ranking', false);
   setPlayerSubpage('overview', false);
   loadIndex();
