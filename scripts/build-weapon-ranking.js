@@ -5,7 +5,11 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const root = process.cwd();
+// 実行時のカレントフォルダに依存しないよう、リポジトリのルートを自動判定する。
+const candidateRoots = [...new Set([process.cwd(), path.resolve(__dirname, '..')])];
+const root = candidateRoots.find(candidate =>
+  fs.existsSync(path.join(candidate, 'data', 'archive-history')) && fs.existsSync(path.join(candidate, 'app.js'))
+) || path.resolve(__dirname, '..');
 const archiveRoot = path.join(root, 'data', 'archive-history');
 const appPath = path.join(root, 'app.js');
 const outputPath = path.join(root, 'data', 'weapon-ranking.json');
@@ -74,6 +78,8 @@ if (!files.length) {
 }
 const best = new Map();
 const usage = new Map();
+// キーはプレイヤー×シーズン。分母は同じシーズンの全ブキ記録、分子は対象ブキ系統の記録。
+const playerSeasonUsage = new Map();
 let totalRows = 0;
 let filesFailed = 0;
 let processedFiles = 0;
@@ -99,6 +105,11 @@ for (const file of files) {
         const weapon = canonicalWeapon(rawWeapon);
         totalRows++;
         usage.set(weapon, (usage.get(weapon) || 0) + 1);
+        const playerSeasonKey = JSON.stringify([playerKey, String(season)]);
+        let seasonUsage = playerSeasonUsage.get(playerSeasonKey);
+        if (!seasonUsage) { seasonUsage = { total: 0, weapons: new Map() }; playerSeasonUsage.set(playerSeasonKey, seasonUsage); }
+        seasonUsage.total++;
+        seasonUsage.weapons.set(weapon, (seasonUsage.weapons.get(weapon) || 0) + 1);
         const candidate = {
           player_key: playerKey,
           name: String(event[2] ?? '名前不明'),
@@ -112,7 +123,7 @@ for (const file of files) {
           date: day.date ?? null,
           source: 'archive'
         };
-        const key = `${playerKey}\u0000${weapon}`;
+        const key = JSON.stringify([playerKey, weapon]);
         const old = best.get(key);
         const oldRank = Number(old?.rank ?? Infinity), newRank = Number(candidate.rank ?? Infinity);
         if (!old || power > old.x_power || (power === old.x_power && newRank < oldRank)) best.set(key, candidate);
@@ -132,17 +143,28 @@ if (!best.size) {
   console.error('No weapon-bearing archive records were found; refusing to write an empty ranking.');
   process.exit(1);
 }
+const rows = [...best.values()].map(row => {
+  const seasonUsage = playerSeasonUsage.get(JSON.stringify([row.player_key, String(row.season)]));
+  const seasonWeaponCount = seasonUsage?.weapons.get(row.weapon_label) || 0;
+  const seasonTotalCount = seasonUsage?.total || 0;
+  return {
+    ...row,
+    season_weapon_count: seasonWeaponCount,
+    season_total_count: seasonTotalCount,
+    season_usage_rate: seasonTotalCount ? seasonWeaponCount / seasonTotalCount * 100 : 0
+  };
+});
 const payload = {
-  schema_version: 1,
+  schema_version: 2,
   generatedAt: new Date().toISOString(),
   filesTotal: files.length,
   filesFailed,
   totalRows,
   usage: Object.fromEntries([...usage.entries()].sort(([a], [b]) => a.localeCompare(b, 'ja'))),
-  rows: [...best.values()]
+  rows
 };
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 fs.writeFileSync(outputPath, `${JSON.stringify(payload)}\n`);
 console.log(`Wrote ${path.relative(root, outputPath)}`);
-console.log(`Archive files: ${files.length}; failed: ${filesFailed}; records: ${totalRows}; player/weapon best rows: ${best.size}`);
+console.log(`Archive files: ${files.length}; failed: ${filesFailed}; records: ${totalRows}; player/weapon best rows: ${rows.length}`);
 console.log(`Size: ${(fs.statSync(outputPath).size / 1024 / 1024).toFixed(2)} MiB`);

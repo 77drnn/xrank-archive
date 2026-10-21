@@ -286,9 +286,11 @@
       if (status) status.textContent = '集計済みデータを取得中…';
       const url = forceReload ? `data/weapon-ranking.json?ts=${Date.now()}` : 'data/weapon-ranking.json';
       const res = await fetch(url, forceReload ? {cache:'no-store'} : {});
-      if (!res.ok) throw new Error(`data/weapon-ranking.json: HTTP ${res.status}。先に scripts/build-weapon-ranking.js を実行し、生成ファイルをコミットしてください。`);
+      if (!res.ok) throw new Error(`data/weapon-ranking.json: HTTP ${res.status}。scripts/build-weapon-ranking.js を再実行し、schema_version 2 の生成ファイルをコミットしてください。`);
       const data = await res.json();
-      if (!Array.isArray(data.rows) || !data.usage || !Number.isFinite(Number(data.totalRows))) throw new Error('data/weapon-ranking.json の形式が不正です');
+      if (Number(data.schema_version) < 2 || !Array.isArray(data.rows) || !data.usage || !Number.isFinite(Number(data.totalRows))) {
+        throw new Error('data/weapon-ranking.json が旧形式です。scripts/build-weapon-ranking.js を再実行して、集計済みJSONを更新してください。');
+      }
       state.weaponArchiveStats = {
         rows: data.rows,
         usage: new Map(Object.entries(data.usage).map(([weapon,count]) => [weapon, Number(count) || 0])),
@@ -311,10 +313,17 @@
     const select = $('weapon-select');
     const slider = $('weapon-usage-filter');
     if (!body || !select) return;
+    // HTML側のスライダーが以前の0～10%設定でも、ここで0～100%へ拡張する。
+    if (slider) {
+      slider.min = '0';
+      slider.max = '100';
+      slider.step = '1';
+      if (Number(slider.value) < 0 || Number(slider.value) > 100) slider.value = '0';
+    }
     const stats = state.weaponArchiveStats;
     if (!stats) {
       if (state.weaponArchiveLoadError) {
-        body.innerHTML = `<tr><td colspan="7" class="empty-state">全アーカイブを読み込めませんでした。${esc(state.weaponArchiveLoadError)}。公開データのパスと player-names-index.json を確認してください。</td></tr>`;
+        body.innerHTML = `<tr><td colspan="7" class="empty-state">集計済みデータを読み込めませんでした。${esc(state.weaponArchiveLoadError)}</td></tr>`;
         $('weapon-ranking-updated').textContent = '読み込み失敗';
         $('weapon-ranking-footer').textContent = 'データを確認してください';
       } else {
@@ -323,50 +332,60 @@
       return;
     }
     state.weaponRankingRows = stats.rows;
-    const threshold = Number(slider?.value || 0);
-    if ($('weapon-usage-value')) $('weapon-usage-value').textContent = `${threshold.toFixed(1)}%以上`;
+    const threshold = Math.max(0, Math.min(100, Number(slider?.value || 0)));
+    if ($('weapon-usage-value')) $('weapon-usage-value').textContent = `${threshold.toFixed(0)}%以上`;
+
     const byWeapon = new Map();
     for (const row of stats.rows) {
+      if (!row.weapon_label) continue;
       if (!byWeapon.has(row.weapon_label)) byWeapon.set(row.weapon_label, []);
       byWeapon.get(row.weapon_label).push(row);
     }
-    const weapons = [...byWeapon.entries()].map(([weapon, rows]) => ({weapon, rows, count:stats.usage.get(weapon) || 0, rate:stats.totalRows ? (stats.usage.get(weapon) || 0) / stats.totalRows * 100 : 0}))
-      .sort((a,b) => b.rate-a.rate || b.rows.length-a.rows.length || a.weapon.localeCompare(b.weapon,'ja'));
-    const filtered = weapons.filter(item => item.rate + 1e-9 >= threshold);
-    if (!filtered.length) {
-      select.innerHTML = '<option value="">条件に合うブキなし</option>';
+    // ここで表示する使用率は全体の武器シェアではなく、プレイヤー個人のシーズン内使用割合。
+    const weapons = [...byWeapon.entries()]
+      .map(([weapon, rows]) => ({weapon, rows}))
+      .sort((a,b) => b.rows.length-a.rows.length || a.weapon.localeCompare(b.weapon,'ja'));
+
+    if (!weapons.length) {
+      select.innerHTML = '<option value="">データなし</option>';
       state.selectedWeaponRanking = '';
-      body.innerHTML = '<tr><td colspan="7" class="empty-state">この使用率以上のブキはありません。スライダーを左に動かしてください。</td></tr>';
+      body.innerHTML = '<tr><td colspan="7" class="empty-state">武器別ランキングの記録がありません。</td></tr>';
       $('weapon-ranking-title').textContent = 'ブキ別高Xパワーランキング';
       $('weapon-ranking-updated').textContent = stats.generatedAt ? `集計更新 ${dateLabel(stats.generatedAt, true)}` : `全アーカイブ ${stats.filesTotal.toLocaleString('ja-JP')}ファイル`;
-      $('weapon-ranking-definition').textContent = `使用率は、全アーカイブでブキが記録された行数 ÷ ブキ情報付き記録の総数。フィルター条件 ${threshold.toFixed(1)}%以上。`;
-      $('weapon-ranking-footer').textContent = '条件に合うブキ 0件';
+      $('weapon-ranking-definition').textContent = '集計済みデータに武器記録がありません。';
+      $('weapon-ranking-footer').textContent = '0人';
       return;
     }
+
     const wanted = state.selectedWeaponRanking || select.value;
-    select.innerHTML = filtered.map(item => `<option value="${esc(item.weapon)}">${esc(item.weapon)} · ${item.rate.toFixed(2)}% · ${item.rows.length.toLocaleString('ja-JP')}人</option>`).join('');
-    state.selectedWeaponRanking = filtered.some(item => item.weapon === wanted) ? wanted : filtered[0].weapon;
+    select.innerHTML = weapons.map(item => `<option value="${esc(item.weapon)}">${esc(item.weapon)} · ${item.rows.length.toLocaleString('ja-JP')}人</option>`).join('');
+    state.selectedWeaponRanking = weapons.some(item => item.weapon === wanted) ? wanted : weapons[0].weapon;
     select.value = state.selectedWeaponRanking;
-    const selected = filtered.find(item => item.weapon === state.selectedWeaponRanking);
-    const rows = [...(selected?.rows || [])].sort((a,b) => Number(b.x_power)-Number(a.x_power) || Number(a.rank ?? Infinity)-Number(b.rank ?? Infinity) || String(a.player_key).localeCompare(String(b.player_key)));
+    const selected = weapons.find(item => item.weapon === state.selectedWeaponRanking);
+    const allRows = [...(selected?.rows || [])].sort((a,b) => Number(b.x_power)-Number(a.x_power) || Number(a.rank ?? Infinity)-Number(b.rank ?? Infinity) || String(a.player_key).localeCompare(String(b.player_key)));
+    const rows = allRows.filter(p => Number(p.season_usage_rate) + 1e-9 >= threshold);
+
     $('weapon-ranking-title').textContent = `${state.selectedWeaponRanking} · 高Xパワーランキング`;
     $('weapon-ranking-updated').textContent = stats.generatedAt ? `集計更新 ${dateLabel(stats.generatedAt, true)}` : `全アーカイブ ${stats.filesTotal.toLocaleString('ja-JP')}ファイル`;
-    $('weapon-ranking-definition').textContent = `事前集計済みデータ。表示中ブキの使用率 ${selected.rate.toFixed(2)}%（${selected.count.toLocaleString('ja-JP')}行 / 全${stats.totalRows.toLocaleString('ja-JP')}行）。使用率フィルターはブキ一覧に適用。レプリカ等の指定された組み合わせは同一ブキとして集計。${stats.filesFailed ? ` 読み込みに失敗したファイル: ${stats.filesFailed.toLocaleString('ja-JP')}件。` : ''}`;
+    $('weapon-ranking-definition').textContent = `使用率フィルターはプレイヤーごとに計算。各行の「シーズン」内で、選択ブキ系統の記録数 ÷ そのプレイヤーの同シーズン全ブキ記録数 × 100。4ルールのアーカイブ記録を合算し、対象武器を使った記録だけでなく全武器記録を分母にします。実際の全試合数ではなく、保存アーカイブで確認できる記録回数です。条件：${threshold.toFixed(0)}%以上。レプリカ等の指定された組み合わせは同一武器として集計。${stats.filesFailed ? ` 読み込みに失敗したファイル: ${stats.filesFailed.toLocaleString('ja-JP')}件。` : ''}`;
     if (!rows.length) {
-      body.innerHTML = '<tr><td colspan="7" class="empty-state">このブキの記録はありません。</td></tr>';
-      $('weapon-ranking-footer').textContent = `${state.selectedWeaponRanking} · 0人`;
+      body.innerHTML = `<tr><td colspan="7" class="empty-state">${esc(state.selectedWeaponRanking)} をそのシーズンに ${threshold.toFixed(0)}%以上使用しているプレイヤーはいません。スライダーを左に動かしてください。</td></tr>`;
+      $('weapon-ranking-footer').textContent = `${state.selectedWeaponRanking} · 条件該当 0 / ${allRows.length.toLocaleString('ja-JP')}人`;
       return;
     }
     body.innerHTML = rows.map((p,i) => {
       const key = String(p.player_key || '');
       const initials = Array.from(String(p.name || '?')).slice(0,1).join('').toUpperCase();
-      const note = p.name_id ? `<span class="player-small">ID ${esc(p.name_id)}</span>` : '';
+      const note = [
+        p.name_id ? `<span class="player-small">ID ${esc(p.name_id)}</span>` : '',
+        `<span class="player-small">同シーズン使用率 ${Number(p.season_usage_rate).toFixed(1)}%（${fmt(p.season_weapon_count)} / ${fmt(p.season_total_count)}記録）</span>`
+      ].filter(Boolean).join('');
       const rule = RULES[p.rule]?.short || '—';
       const season = p.season ? seasonLabel(p.season) : '—';
       const at = p.at ? dateLabel(p.at,true) : (p.date ? dateLabel(p.date) : '—');
       return `<tr><td>${rankBadge(i+1)}</td><td><button class="player-link" type="button" data-weapon-player-key="${esc(key)}" aria-label="${esc(p.name || '名前不明')} の履歴を表示"><span class="avatar">${esc(initials)}</span><span><span class="player-name">${esc(p.name || '名前不明')}</span>${note}</span></button></td><td><span class="power-value">${fmt(p.x_power)}</span></td><td>${esc(rule)}</td><td>${esc(season)}</td><td>${p.rank != null ? `#${fmt(p.rank)}` : '—'}</td><td>${esc(at)}</td></tr>`;
     }).join('');
-    $('weapon-ranking-footer').textContent = `${state.selectedWeaponRanking} · ${rows.length.toLocaleString('ja-JP')}人 · 使用率 ${selected.rate.toFixed(2)}%`;
+    $('weapon-ranking-footer').textContent = `${state.selectedWeaponRanking} · 表示 ${rows.length.toLocaleString('ja-JP')} / ${allRows.length.toLocaleString('ja-JP')}人 · 使用率 ${threshold.toFixed(0)}%以上`;
   }
 
   async function loadIndex() {
