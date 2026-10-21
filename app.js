@@ -274,74 +274,29 @@
     $('alltime-footer').textContent = `${headerName} · ${rows.length.toLocaleString('ja-JP')} / ${Math.min(maxLabel,total).toLocaleString('ja-JP')} 件表示 · 全対象 ${total.toLocaleString('ja-JP')} 人`;
   }
 
-  // 全アーカイブの月別・プレイヤーシャードを走査し、ブキ別最高XPと使用率を集計する。
-  async function loadAllArchiveWeaponRanking() {
-    if (state.weaponArchiveStats) return state.weaponArchiveStats;
-    if (state.weaponArchiveLoadPromise) return state.weaponArchiveLoadPromise;
+  // 事前生成した集計JSONを1ファイルだけ読み込む。アーカイブ全件の走査はビルド時に行う。
+  async function loadAllArchiveWeaponRanking(forceReload = false) {
+    if (state.weaponArchiveStats && !forceReload) return state.weaponArchiveStats;
+    if (state.weaponArchiveLoadPromise && !forceReload) return state.weaponArchiveLoadPromise;
     state.weaponArchiveLoadError = '';
     state.weaponArchiveLoadPromise = (async () => {
       const body = $('weapon-ranking-body');
       const status = $('weapon-ranking-updated');
-      const nameIndex = await loadPlayerNameIndex();
-      const players = Object.entries(nameIndex.players || {});
-      if (!players.length) throw new Error('player-names-index.json にアーカイブ索引がありません');
-      const files = new Set();
-      for (const [mapKey, player] of players) {
-        const key = String(player.key || mapKey);
-        const shard = String(playerHistoryShard(key)).padStart(2, '0');
-        for (const [season, rules] of Object.entries(player.history_months || {})) {
-          for (const [rule, months] of Object.entries(rules || {})) {
-            if (!RULES[rule] || !Array.isArray(months)) continue;
-            for (const month of months) files.add(`data/archive-history/${encodeURIComponent(season)}/${encodeURIComponent(rule)}/${encodeURIComponent(month)}-s${shard}.jsonl`);
-          }
-        }
-      }
-      const paths = [...files];
-      if (!paths.length) throw new Error('全アーカイブの月別ファイルが索引に見つかりません');
-      const best = new Map();
-      const usage = new Map();
-      let totalRows = 0, completed = 0, failed = 0;
-      const concurrency = 8;
-      if (body) body.innerHTML = `<tr><td colspan="7" class="empty-state">全アーカイブを読み込んでいます… 0 / ${paths.length.toLocaleString('ja-JP')} ファイル</td></tr>`;
-      if (status) status.textContent = `全アーカイブ準備中 · ${paths.length.toLocaleString('ja-JP')}ファイル`;
-      const processFile = async path => {
-        try {
-          const res = await fetch(`${path}?ts=${Date.now()}`, {cache:'no-store'});
-          if (!res.ok) { if (res.status !== 404) failed++; return; }
-          const text = await res.text();
-          for (const line of text.split(/\r?\n/)) {
-            if (!line.trim()) continue;
-            let day;
-            try { day = JSON.parse(line); } catch { continue; }
-            const season = day.season || path.match(/archive-history\/([^/]+)/)?.[1] || '';
-            const rule = day.rule || path.match(/archive-history\/[^/]+\/([^/]+)/)?.[1] || '';
-            if (!RULES[rule]) continue;
-            for (const event of (day.events || [])) {
-              if (!Array.isArray(event) || event.length < 5) continue;
-              const playerKey = String(event[1] ?? '');
-              const rawWeapon = event[5];
-              const power = Number(event[4]);
-              if (!playerKey || rawWeapon == null || rawWeapon === '' || !Number.isFinite(power)) continue;
-              const weapon = canonicalWeapon(rawWeapon);
-              totalRows++;
-              usage.set(weapon, (usage.get(weapon) || 0) + 1);
-              const candidate = { player_key:playerKey, name:String(event[2] ?? '名前不明'), rank:event[3], x_power:power, weapon_label:weapon, name_id:event[6], rule, season, at:event[0], date:day.date, source:'archive' };
-              const key = `${playerKey}\u0000${weapon}`;
-              const old = best.get(key);
-              const oldRank = Number(old?.rank ?? Infinity), newRank = Number(candidate.rank ?? Infinity);
-              if (!old || power > old.x_power || (power === old.x_power && newRank < oldRank)) best.set(key, candidate);
-            }
-          }
-        } catch (e) { failed++; console.warn('Weapon archive file failed', path, e); }
+      if (body) body.innerHTML = '<tr><td colspan="7" class="empty-state">集計済みブキデータを読み込んでいます…</td></tr>';
+      if (status) status.textContent = '集計済みデータを取得中…';
+      const url = forceReload ? `data/weapon-ranking.json?ts=${Date.now()}` : 'data/weapon-ranking.json';
+      const res = await fetch(url, forceReload ? {cache:'no-store'} : {});
+      if (!res.ok) throw new Error(`data/weapon-ranking.json: HTTP ${res.status}。先に scripts/build-weapon-ranking.js を実行し、生成ファイルをコミットしてください。`);
+      const data = await res.json();
+      if (!Array.isArray(data.rows) || !data.usage || !Number.isFinite(Number(data.totalRows))) throw new Error('data/weapon-ranking.json の形式が不正です');
+      state.weaponArchiveStats = {
+        rows: data.rows,
+        usage: new Map(Object.entries(data.usage).map(([weapon,count]) => [weapon, Number(count) || 0])),
+        totalRows: Number(data.totalRows) || 0,
+        filesTotal: Number(data.filesTotal) || 0,
+        filesFailed: Number(data.filesFailed) || 0,
+        generatedAt: data.generatedAt || ''
       };
-      for (let i=0; i<paths.length; i+=concurrency) {
-        await Promise.all(paths.slice(i, i+concurrency).map(processFile));
-        completed = Math.min(i + concurrency, paths.length);
-        if (status) status.textContent = `全アーカイブ取得 ${completed.toLocaleString('ja-JP')} / ${paths.length.toLocaleString('ja-JP')}`;
-        if (body) body.innerHTML = `<tr><td colspan="7" class="empty-state">全アーカイブを集計中… ${completed.toLocaleString('ja-JP')} / ${paths.length.toLocaleString('ja-JP')} ファイル</td></tr>`;
-      }
-      if (!best.size) throw new Error('アーカイブ内にブキとXパワーが揃った記録がありません');
-      state.weaponArchiveStats = { rows:[...best.values()], usage, totalRows, filesTotal:paths.length, filesFailed:failed, generatedAt:new Date().toISOString() };
       return state.weaponArchiveStats;
     })().catch(error => {
       state.weaponArchiveLoadError = error?.message || String(error);
@@ -383,7 +338,7 @@
       state.selectedWeaponRanking = '';
       body.innerHTML = '<tr><td colspan="7" class="empty-state">この使用率以上のブキはありません。スライダーを左に動かしてください。</td></tr>';
       $('weapon-ranking-title').textContent = 'ブキ別高Xパワーランキング';
-      $('weapon-ranking-updated').textContent = `全アーカイブ ${stats.filesTotal.toLocaleString('ja-JP')}ファイル`;
+      $('weapon-ranking-updated').textContent = stats.generatedAt ? `集計更新 ${dateLabel(stats.generatedAt, true)}` : `全アーカイブ ${stats.filesTotal.toLocaleString('ja-JP')}ファイル`;
       $('weapon-ranking-definition').textContent = `使用率は、全アーカイブでブキが記録された行数 ÷ ブキ情報付き記録の総数。フィルター条件 ${threshold.toFixed(1)}%以上。`;
       $('weapon-ranking-footer').textContent = '条件に合うブキ 0件';
       return;
@@ -395,8 +350,8 @@
     const selected = filtered.find(item => item.weapon === state.selectedWeaponRanking);
     const rows = [...(selected?.rows || [])].sort((a,b) => Number(b.x_power)-Number(a.x_power) || Number(a.rank ?? Infinity)-Number(b.rank ?? Infinity) || String(a.player_key).localeCompare(String(b.player_key)));
     $('weapon-ranking-title').textContent = `${state.selectedWeaponRanking} · 高Xパワーランキング`;
-    $('weapon-ranking-updated').textContent = `全アーカイブ ${stats.filesTotal.toLocaleString('ja-JP')}ファイル`;
-    $('weapon-ranking-definition').textContent = `全アーカイブの記録を走査。表示中ブキの使用率 ${selected.rate.toFixed(2)}%（${selected.count.toLocaleString('ja-JP')}行 / 全${stats.totalRows.toLocaleString('ja-JP')}行）。使用率フィルターはブキ一覧に適用。レプリカ等の指定された組み合わせは同一ブキとして集計。${stats.filesFailed ? ` 読み込みに失敗したファイル: ${stats.filesFailed.toLocaleString('ja-JP')}件。` : ''}`;
+    $('weapon-ranking-updated').textContent = stats.generatedAt ? `集計更新 ${dateLabel(stats.generatedAt, true)}` : `全アーカイブ ${stats.filesTotal.toLocaleString('ja-JP')}ファイル`;
+    $('weapon-ranking-definition').textContent = `事前集計済みデータ。表示中ブキの使用率 ${selected.rate.toFixed(2)}%（${selected.count.toLocaleString('ja-JP')}行 / 全${stats.totalRows.toLocaleString('ja-JP')}行）。使用率フィルターはブキ一覧に適用。レプリカ等の指定された組み合わせは同一ブキとして集計。${stats.filesFailed ? ` 読み込みに失敗したファイル: ${stats.filesFailed.toLocaleString('ja-JP')}件。` : ''}`;
     if (!rows.length) {
       body.innerHTML = '<tr><td colspan="7" class="empty-state">このブキの記録はありません。</td></tr>';
       $('weapon-ranking-footer').textContent = `${state.selectedWeaponRanking} · 0人`;
@@ -750,7 +705,7 @@
     else if (state.currentPage !== 'ranking') setActivePage('ranking');
     else toast('すでにランキング画面です。');
   });
-  $('reload-button').addEventListener('click',async()=>{state.dataCache.clear();state.loadedRules.clear();state.allRows=[];state.index=null;state.hourlyIndex=null;state.allTimeIndex=null;state.nameIndex=null;state.nameIndexPromise=null;state.weaponRankingRows=[];state.weaponArchiveStats=null;state.weaponArchiveLoadPromise=null;state.weaponArchiveLoadError='';await Promise.all([loadIndex(),loadAllTimeRanking(true)]);if(state.currentPage==='weapons')loadAllArchiveWeaponRanking().then(renderWeaponRanking).catch(()=>renderWeaponRanking());toast('ランキングと全期間最高Xパワーを読み直しました。');});
+  $('reload-button').addEventListener('click',async()=>{state.dataCache.clear();state.loadedRules.clear();state.allRows=[];state.index=null;state.hourlyIndex=null;state.allTimeIndex=null;state.nameIndex=null;state.nameIndexPromise=null;state.weaponRankingRows=[];state.weaponArchiveStats=null;state.weaponArchiveLoadPromise=null;state.weaponArchiveLoadError='';await Promise.all([loadIndex(),loadAllTimeRanking(true)]);if(state.currentPage==='weapons')loadAllArchiveWeaponRanking(true).then(renderWeaponRanking).catch(()=>renderWeaponRanking());toast('ランキングと全期間最高Xパワーを読み直しました。');});
   setActivePage('ranking', false);
   setPlayerSubpage('overview', false);
   loadIndex();
