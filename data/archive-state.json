@@ -1491,9 +1491,10 @@
     "2026-10-17",
     "2026-10-18",
     "2026-10-19",
-    "2026-10-20"
+    "2026-10-20",
+    "2026-10-21"
   ],
-  "latest_archive_day": "2026-10-20",
+  "latest_archive_day": "2026-10-21",
   "backfill_started": true,
   "backfill_complete": true,
   "backfill_remaining_days": 0,
