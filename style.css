@@ -135,3 +135,6 @@ body{background:#f4f5f7!important;font-size:13px;line-height:1.5}
 
 /* Full archive weapon ranking / usage-rate slider */
 .weapon-usage-filter{padding:0 20px 13px;max-width:560px}.weapon-usage-filter .field-label{display:flex;justify-content:space-between;gap:10px;align-items:center}.weapon-usage-filter .field-label strong{color:#1d4ed8;font-size:12px}.weapon-usage-filter input[type=range]{display:block;width:100%;accent-color:#2563eb;margin:10px 0 3px;cursor:pointer}.weapon-usage-scale{display:flex;justify-content:space-between;color:#667085;font-size:10px}.weapon-usage-filter input[type=range]:focus-visible{outline:2px solid #2563eb;outline-offset:3px}@media(max-width:760px){.weapon-usage-filter{padding:0 12px 12px;width:100%;max-width:none}.weapon-usage-filter .field-label{font-size:11px}.weapon-usage-filter .field-label strong{font-size:11px}}
+
+/* v11: same-season usage filter */
+.weapon-usage-scale{justify-content:space-between}

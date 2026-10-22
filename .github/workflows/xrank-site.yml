@@ -10,7 +10,7 @@ on:
         default: false
   schedule:
     # UTC. Runs even when the user's computer/site is closed; GitHub can delay schedules.
-    - cron: '11 * * * *'
+    - cron: '10 * * * *'
 
 permissions:
   contents: write
@@ -51,6 +51,17 @@ jobs:
           else
             python update_xrank.py
           fi
+
+      - name: Import missing P-season source rankings from splatoon3.ink
+        run: python scripts/import_missing_p_seasons.py
+
+      - name: Set up Node.js for weapon ranking aggregation
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build precomputed weapon ranking JSON
+        run: node scripts/build-weapon-ranking.js
 
       - name: Save changed data to repository
         id: commit

@@ -13,6 +13,7 @@ const root = candidateRoots.find(candidate =>
 const archiveRoot = path.join(root, 'data', 'archive-history');
 const appPath = path.join(root, 'app.js');
 const outputPath = path.join(root, 'data', 'weapon-ranking.json');
+const sourceXrankRoot = path.join(root, 'data', 'source-xrank');
 
 const WEAPON_GROUPS = [
   ['スプラシューター', ['スプラシューター','ヒーローシューター レプリカ','ヒーローシューターレプリカ','オーダーシューター レプリカ','オーダーシューターレプリカ','Hero Shot Replica','Order Shot Replica']],
@@ -78,8 +79,9 @@ if (!files.length) {
 }
 const best = new Map();
 const usage = new Map();
-// キーはプレイヤー×シーズン。分母は同じシーズンの全ブキ記録、分子は対象ブキ系統の記録。
-const playerSeasonUsage = new Map();
+// キーはプレイヤー×シーズン×ルール。最高XPを記録したルール内だけで使用率を計算。
+const playerSeasonRuleUsage = new Map();
+const archiveSeasonRules = new Set();
 let totalRows = 0;
 let filesFailed = 0;
 let processedFiles = 0;
@@ -103,11 +105,12 @@ for (const file of files) {
         const power = Number(event[4]);
         if (!playerKey || rawWeapon == null || rawWeapon === '' || !Number.isFinite(power)) continue;
         const weapon = canonicalWeapon(rawWeapon);
+        archiveSeasonRules.add(`${season}\u0000${rule}`);
         totalRows++;
         usage.set(weapon, (usage.get(weapon) || 0) + 1);
-        const playerSeasonKey = JSON.stringify([playerKey, String(season)]);
-        let seasonUsage = playerSeasonUsage.get(playerSeasonKey);
-        if (!seasonUsage) { seasonUsage = { total: 0, weapons: new Map() }; playerSeasonUsage.set(playerSeasonKey, seasonUsage); }
+        const playerSeasonRuleKey = JSON.stringify([playerKey, String(season), rule]);
+        let seasonUsage = playerSeasonRuleUsage.get(playerSeasonRuleKey);
+        if (!seasonUsage) { seasonUsage = { total: 0, weapons: new Map() }; playerSeasonRuleUsage.set(playerSeasonRuleKey, seasonUsage); }
         seasonUsage.total++;
         seasonUsage.weapons.set(weapon, (seasonUsage.weapons.get(weapon) || 0) + 1);
         const candidate = {
@@ -139,12 +142,82 @@ for (const file of files) {
   }
 }
 process.stdout.write('\n');
+
+// assets.splatoon3.ink の P シーズン公開ランキングは、アーカイブが欠けている
+// season/rule のみ補完に使う。アーカイブがある組み合わせに混ぜると、1回だけの
+// スナップショットが使用率を歪めるため、存在する組み合わせは必ずアーカイブ優先。
+const ruleNodeKeys = {
+  splatzones: 'xRankingArea',
+  towercontrol: 'xRankingLift',
+  rainmaker: 'xRankingGl',
+  clamblitz: 'xRankingCl'
+};
+function listJson(dir) {
+  if (!fs.existsSync(dir)) return [];
+  const found = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) found.push(...listJson(full));
+    else if (entry.isFile() && /^xrank\.detail\.p-\d+\.(splatzones|towercontrol|rainmaker|clamblitz)\.json$/i.test(entry.name)) found.push(full);
+  }
+  return found;
+}
+let importedRows = 0;
+for (const file of listJson(sourceXrankRoot)) {
+  try {
+    const rel = path.relative(sourceXrankRoot, file).split(path.sep);
+    const season = rel[0] || (path.basename(file).match(/xrank\.detail\.(p-\d+)\./i) || [])[1];
+    const rule = (path.basename(file).match(/\.(splatzones|towercontrol|rainmaker|clamblitz)\.json$/i) || [])[1];
+    if (!season || !rule || archiveSeasonRules.has(`${season}\u0000${rule}`)) continue;
+    const payload = JSON.parse(fs.readFileSync(file, 'utf8'));
+    const nodeKey = ruleNodeKeys[rule];
+    const edges = payload?.data?.node?.[nodeKey]?.edges;
+    if (!Array.isArray(edges)) continue;
+    for (const edge of edges) {
+      const p = edge?.node;
+      const power = Number(p?.xPower);
+      const rawWeapon = p?.weapon?.name;
+      if (!p || !Number.isFinite(power) || !rawWeapon) continue;
+      const playerKey = String(p.id || `${season}:${rule}:${p.nameId || p.name || p.rank}`);
+      const weapon = canonicalWeapon(rawWeapon);
+      totalRows++;
+      importedRows++;
+      usage.set(weapon, (usage.get(weapon) || 0) + 1);
+      const playerSeasonRuleKey = JSON.stringify([playerKey, String(season), rule]);
+      let seasonUsage = playerSeasonRuleUsage.get(playerSeasonRuleKey);
+      if (!seasonUsage) { seasonUsage = { total: 0, weapons: new Map() }; playerSeasonRuleUsage.set(playerSeasonRuleKey, seasonUsage); }
+      seasonUsage.total++;
+      seasonUsage.weapons.set(weapon, (seasonUsage.weapons.get(weapon) || 0) + 1);
+      const candidate = {
+        player_key: playerKey,
+        name: String(p.name || p.byname || '名前不明'),
+        rank: p.rank ?? null,
+        x_power: power,
+        weapon_label: weapon,
+        name_id: p.nameId ?? null,
+        rule,
+        season,
+        at: null,
+        date: null,
+        source: 'season-endpoint'
+      };
+      const key = JSON.stringify([playerKey, weapon]);
+      const old = best.get(key);
+      const oldRank = Number(old?.rank ?? Infinity), newRank = Number(candidate.rank ?? Infinity);
+      if (!old || power > old.x_power || (power === old.x_power && newRank < oldRank)) best.set(key, candidate);
+    }
+  } catch (error) {
+    filesFailed++;
+    console.warn(`Failed to read ${path.relative(root, file)}: ${error.message}`);
+  }
+}
+console.log(`Imported fallback P-season rows: ${importedRows.toLocaleString()}`);
 if (!best.size) {
   console.error('No weapon-bearing archive records were found; refusing to write an empty ranking.');
   process.exit(1);
 }
 const rows = [...best.values()].map(row => {
-  const seasonUsage = playerSeasonUsage.get(JSON.stringify([row.player_key, String(row.season)]));
+  const seasonUsage = playerSeasonRuleUsage.get(JSON.stringify([row.player_key, String(row.season), row.rule]));
   const seasonWeaponCount = seasonUsage?.weapons.get(row.weapon_label) || 0;
   const seasonTotalCount = seasonUsage?.total || 0;
   return {
@@ -155,7 +228,7 @@ const rows = [...best.values()].map(row => {
   };
 });
 const payload = {
-  schema_version: 2,
+  schema_version: 3,
   generatedAt: new Date().toISOString(),
   filesTotal: files.length,
   filesFailed,
