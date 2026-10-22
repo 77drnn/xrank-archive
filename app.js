@@ -315,10 +315,10 @@
     if (!body || !select) return;
     // HTML側のスライダーが以前の0～10%設定でも、ここで0～100%へ拡張する。
     if (slider) {
-      slider.min = '0';
+      slider.min = '1';
       slider.max = '100';
       slider.step = '1';
-      if (Number(slider.value) < 0 || Number(slider.value) > 100) slider.value = '0';
+      if (Number(slider.value) < 1 || Number(slider.value) > 100) slider.value = '1';
     }
     const stats = state.weaponArchiveStats;
     if (!stats) {
@@ -332,7 +332,7 @@
       return;
     }
     state.weaponRankingRows = stats.rows;
-    const threshold = Math.max(0, Math.min(100, Number(slider?.value || 0)));
+    const threshold = Math.max(1, Math.min(100, Number(slider?.value || 1)));
     if ($('weapon-usage-value')) $('weapon-usage-value').textContent = `${threshold.toFixed(0)}%以上`;
 
     const byWeapon = new Map();
