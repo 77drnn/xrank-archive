@@ -43,14 +43,16 @@ jobs:
       - name: Install archive compression dependency
         run: python -m pip install -r requirements.txt
 
-      - name: Collect P-season X rankings and historical archives
+      - name: Fetch the newest X ranking for all four rules
         shell: bash
         run: |
+          test -f update_xrank.py || { echo "::error::update_xrank.py がリポジトリ直下にありません"; exit 1; }
           if [ "${{ github.event.inputs.backfill_archive }}" = "true" ]; then
             python update_xrank.py --backfill-archive
           else
             python update_xrank.py
           fi
+          echo "update_xrank.py completed: current P-season ranking should include all four rules."
 
       - name: Import missing P-season source rankings from splatoon3.ink
         run: python scripts/import_missing_p_seasons.py
@@ -63,6 +65,9 @@ jobs:
       - name: Build precomputed weapon ranking JSON
         run: node scripts/build-weapon-ranking.js
 
+      - name: Prepare mobile-friendly static site
+        run: python prepare_site.py
+
       - name: Save changed data to repository
         id: commit
         shell: bash
@@ -72,7 +77,7 @@ jobs:
           git add data
           if git diff --cached --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "No ranking changes; no data commit needed."
+            echo "No ranking data changes; publishing the refreshed static site anyway."
           else
             git commit -m "Update P-season X ranking archive"
             git push
@@ -80,20 +85,13 @@ jobs:
           fi
 
       - name: Configure GitHub Pages
-        if: ${{ steps.commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch' }}
         uses: actions/configure-pages@v5
 
-      - name: Prepare mobile-friendly static site
-        if: ${{ steps.commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch' }}
-        run: python prepare_site.py
-
       - name: Upload site artifact
-        if: ${{ steps.commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-pages-artifact@v3
         with:
           path: public
 
       - name: Publish to GitHub Pages
         id: deployment
-        if: ${{ steps.commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch' }}
         uses: actions/deploy-pages@v4
