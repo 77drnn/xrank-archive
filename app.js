@@ -9,7 +9,7 @@
     clamblitz: { ja: 'ガチアサリ', short: 'アサリ' }
   };
   const $ = (id) => document.getElementById(id);
-  const state = { index: null, rows: [], allRows: [], currentPlayer: null, currentPage: 'ranking', previousPage: 'ranking', selectedPlayerSubpage: 'overview', selectedRule: 'splatzones', dataCache: new Map(), loadedRules: new Set(), hourlyIndex: null, nameIndex: null, nameIndexPromise: null, archiveCache: new Map(), pastNameRows: [], pastNamesVisible: 0, pastNamesLoaded: false, allTimeIndex: null, selectedAllTime: 'overall', allTimeRows: [], selectedWeaponRanking: '', weaponRankingRows: [], weaponArchiveStats: null, weaponArchiveLoadPromise: null, weaponArchiveLoadError: '' };
+  const state = { index: null, rows: [], allRows: [], currentPlayer: null, currentPage: 'ranking', previousPage: 'ranking', selectedPlayerSubpage: 'overview', selectedRule: 'splatzones', dataCache: new Map(), loadedRules: new Set(), hourlyIndex: null, nameIndex: null, nameIndexPromise: null, archiveCache: new Map(), pastNameRows: [], pastNamesVisible: 0, pastNamesLoaded: false, allTimeIndex: null, selectedAllTime: 'overall', allTimeRows: [], selectedWeaponRanking: '', weaponRankingRows: [], weaponArchiveStats: null, weaponArchiveLoadPromise: null, weaponArchiveLoadError: '', festData: null, festRows: [], selectedFestival: '', selectedFestView: 'event' };
   const seasonOrder = (a, b) => {
     const aa = String(a).match(/^([a-z]+)-(\d+)$/i) || ['', '', '0'];
     const bb = String(b).match(/^([a-z]+)-(\d+)$/i) || ['', '', '0'];
@@ -213,6 +213,77 @@
       $('archive-progress-count').textContent = '初回データ取得待ち';
       $('archive-progress-note').textContent = '初回のクラウド収集で公開元の全アーカイブを調査し、Pシーズンの名前・順位・Xパワー履歴を過去へ遡って取り込みます。';
     }
+  }
+
+  async function loadFestRankings(force = false) {
+    if (state.festData && !force) { renderFestRankings(); return state.festData; }
+    const body = $('fest-ranking-body');
+    if (body) body.innerHTML = '<tr><td colspan="4" class="empty-state">フェスランキングを読み込んでいます…</td></tr>';
+    try {
+      const res = await fetch(`data/fest-rankings.json?ts=${Date.now()}`, {cache:'no-store'});
+      if (!res.ok) throw new Error(`fest-rankings.json: HTTP ${res.status}`);
+      const data = await res.json();
+      if (Number(data.schema_version) < 1 || !Array.isArray(data.festivals)) throw new Error('フェスランキングJSONの形式が不正です');
+      state.festData = data;
+      state.festRows = data.festivals.flatMap(f => (f.players || []).map(p => ({...p, festival_key:f.key, festival_title:f.title || f.key, region:'JP'})));
+      renderFestRankings();
+      return data;
+    } catch (err) {
+      console.warn('Festival rankings are not available yet', err);
+      if (body) body.innerHTML = `<tr><td colspan="4" class="empty-state"><strong>フェスランキングを読み込めません</strong><p>${esc(err.message)}。GitHub Actionsでフェスデータを取得し、data/fest-rankings.jsonを生成してください。</p></td></tr>`;
+      const all = $('fest-alltime-body');
+      if (all) all.innerHTML = `<tr><td colspan="6" class="empty-state">${esc(err.message)}</td></tr>`;
+      $('fest-updated').textContent = 'データ未生成';
+      return null;
+    }
+  }
+
+  function renderFestRankings() {
+    const data = state.festData;
+    if (!data) return;
+    const select = $('fest-select');
+    const teamSelect = $('fest-team-select');
+    const fests = Array.isArray(data.festivals) ? data.festivals : [];
+    const wanted = state.selectedFestival || select.value;
+    select.innerHTML = fests.map(f => `<option value="${esc(f.key)}">${esc(f.title || f.key)}</option>`).join('') || '<option value="">フェスデータなし</option>';
+    state.selectedFestival = fests.some(f => f.key === wanted) ? wanted : (fests[0]?.key || '');
+    select.value = state.selectedFestival;
+    const current = fests.find(f => f.key === state.selectedFestival);
+    const teams = [...new Set((current?.players || []).map(p => p.team || '陣営不明'))].sort((a,b)=>a.localeCompare(b,'ja'));
+    const oldTeam = teamSelect.value;
+    teamSelect.innerHTML = '<option value="all">全陣営</option>' + teams.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('');
+    teamSelect.value = teams.includes(oldTeam) ? oldTeam : 'all';
+    const eventPanel = $('fest-event-panel'), allPanel = $('fest-alltime-panel');
+    eventPanel.classList.toggle('page-hidden', state.selectedFestView !== 'event');
+    allPanel.classList.toggle('page-hidden', state.selectedFestView !== 'alltime');
+    document.querySelectorAll('[data-fest-view]').forEach(b=>b.classList.toggle('active', b.dataset.festView === state.selectedFestView));
+    $('fest-updated').textContent = data.generated_at ? `収集 ${dateLabel(data.generated_at, true)}` : '収集日時不明';
+    const eventRows = (current?.players || []).filter(p => teamSelect.value === 'all' || (p.team || '陣営不明') === teamSelect.value)
+      .sort((a,b)=>Number(a.rank)-Number(b.rank) || Number(b.fest_power)-Number(a.fest_power));
+    $('fest-result-title').textContent = current ? (current.title || current.key) : 'フェスランキング';
+    $('fest-result-subtitle').textContent = current ? `JP · ${new Set((current.players || []).map(p=>p.team)).size} 陣営 · ${eventRows.length.toLocaleString('ja-JP')} 人分` : '収録データなし';
+    $('fest-ranking-body').innerHTML = eventRows.length ? eventRows.map((p,i)=>{
+      const key=String(p.player_key || `fest-player:name:${p.name || ''}`), initials=Array.from(String(p.name || '?')).slice(0,1).join('').toUpperCase();
+      return `<tr><td>${rankBadge(p.rank || i+1)}</td><td><button class="player-link" type="button" data-fest-player-key="${esc(key)}" aria-label="${esc(p.name || '名前不明')} のフェス履歴を表示"><span class="avatar">${esc(initials)}</span><span><span class="player-name">${esc(p.name || '名前不明')}</span>${p.name_id ? `<span class="player-small">ID ${esc(p.name_id)}</span>` : ''}</span></button></td><td><span class="power-value">${fmt(p.fest_power)}</span></td><td>${esc(p.team || '陣営不明')}</td></tr>`;
+    }).join('') : '<tr><td colspan="4" class="empty-state">このフェス・陣営のランキングデータがありません。</td></tr>';
+    $('fest-ranking-footer').textContent = `${current?.title || current?.key || 'フェス'} · ${eventRows.length.toLocaleString('ja-JP')} 件 · 出典 splatoon3.ink`;
+    const top = Array.isArray(data.all_time_top1000) ? data.all_time_top1000 : [];
+    $('fest-alltime-body').innerHTML = top.length ? top.map((p,i)=>{
+      const key=String(p.player_key || ''), initials=Array.from(String(p.name || '?')).slice(0,1).join('').toUpperCase();
+      return `<tr><td>${rankBadge(p.all_time_rank || i+1)}</td><td><button class="player-link" type="button" data-fest-player-key="${esc(key)}" aria-label="${esc(p.name || '名前不明')} のフェス履歴を表示"><span class="avatar">${esc(initials)}</span><span><span class="player-name">${esc(p.name || '名前不明')}</span>${p.name_id ? `<span class="player-small">ID ${esc(p.name_id)}</span>` : ''}</span></button></td><td><span class="power-value">${fmt(p.fest_power)}</span></td><td>${esc(p.festival_title || p.festival_key || '—')}</td><td>${esc(p.team || '陣営不明')}</td><td>#${fmt(p.rank)}</td></tr>`;
+    }).join('') : '<tr><td colspan="6" class="empty-state">歴代フェスパワーのデータがありません。</td></tr>';
+    $('fest-alltime-footer').textContent = `歴代フェスパワー TOP ${top.length.toLocaleString('ja-JP')} · 同じプレイヤーは最高記録1件のみ`;
+  }
+
+  function renderFestHistory() {
+    if (!state.currentPlayer) return;
+    const key = state.currentPlayer.key;
+    const rows = state.festRows.filter(p => String(p.player_key || '') === key)
+      .sort((a,b)=>String(b.festival_key).localeCompare(String(a.festival_key),'ja',{numeric:true}) || Number(a.rank)-Number(b.rank));
+    const body = $('player-fest-history-body');
+    if (!body) return;
+    body.innerHTML = rows.length ? rows.map(p=>`<tr><td>${esc(p.festival_title || p.festival_key || '—')}</td><td>${esc(p.team || '陣営不明')}</td><td>#${fmt(p.rank)}</td><td><span class="power-value">${fmt(p.fest_power)}</span></td></tr>`).join('') : '<tr><td colspan="4" class="empty-state">このプレイヤーのフェス順位は見つかりません。公開データに載ったフェスに限られます。</td></tr>';
+    $('player-fest-history-meta').textContent = `${rows.length.toLocaleString('ja-JP')} 件のフェス掲載記録 · JP公開ランキング内で一致した識別子を表示`;
   }
 
   async function loadAllTimeRanking(force = false) {
@@ -493,7 +564,7 @@
   }
   async function showPlayer(key) {
     if (state.currentPage !== 'player') state.previousPage = state.currentPage || 'ranking';
-    const selectedRow = state.rows.find(p => nodeKey(p) === key) || state.allRows.find(p => nodeKey(p) === key) || state.allTimeRows.find(p => nodeKey(p) === key);
+    const selectedRow = state.rows.find(p => nodeKey(p) === key) || state.allRows.find(p => nodeKey(p) === key) || state.allTimeRows.find(p => nodeKey(p) === key) || state.festRows.find(p => nodeKey(p) === key);
     const idx = await loadPlayerNameIndex();
     const nameMeta = idx.players?.[key];
     if (!selectedRow && !nameMeta) return;
@@ -514,6 +585,7 @@
     $('hourly-chart').innerHTML = '<div class="chart-empty">時間別の記録を読み込んでいます…</div>';
     $('player-panel').scrollIntoView({behavior:'smooth',block:'start'});
     await Promise.all([renderPlayerHistory(), renderHourlyHistory(), renderArchiveHistory(), renderNameHistory()]);
+    renderFestHistory();
   }
   async function renderNameHistory() {
     if (!state.currentPlayer) return;
@@ -701,7 +773,13 @@
     e.preventDefault();
     setActivePage(button.dataset.pageNav);
     if (button.dataset.pageNav === 'weapons') loadAllArchiveWeaponRanking().then(renderWeaponRanking).catch(error => { console.warn(error); renderWeaponRanking(); });
+    if (button.dataset.pageNav === 'fest') loadFestRankings();
   });
+  $('fest-select').addEventListener('change', () => { state.selectedFestival = $('fest-select').value; renderFestRankings(); });
+  $('fest-team-select').addEventListener('change', renderFestRankings);
+  $('fest-view-tabs').addEventListener('click', e => { const b=e.target.closest('[data-fest-view]'); if(!b)return; state.selectedFestView=b.dataset.festView; renderFestRankings(); });
+  $('fest-ranking-body').addEventListener('click', e => { const b=e.target.closest('[data-fest-player-key]'); if(b)showPlayer(b.dataset.festPlayerKey); });
+  $('fest-alltime-body').addEventListener('click', e => { const b=e.target.closest('[data-fest-player-key]'); if(b)showPlayer(b.dataset.festPlayerKey); });
   $('player-subnav').addEventListener('click', e => {
     const button = e.target.closest('[data-player-subnav]');
     if (button) setPlayerSubpage(button.dataset.playerSubnav);
@@ -725,9 +803,10 @@
     else if (state.currentPage !== 'ranking') setActivePage('ranking');
     else toast('すでにランキング画面です。');
   });
-  $('reload-button').addEventListener('click',async()=>{state.dataCache.clear();state.loadedRules.clear();state.allRows=[];state.index=null;state.hourlyIndex=null;state.allTimeIndex=null;state.nameIndex=null;state.nameIndexPromise=null;state.weaponRankingRows=[];state.weaponArchiveStats=null;state.weaponArchiveLoadPromise=null;state.weaponArchiveLoadError='';await Promise.all([loadIndex(),loadAllTimeRanking(true)]);if(state.currentPage==='weapons')loadAllArchiveWeaponRanking(true).then(renderWeaponRanking).catch(()=>renderWeaponRanking());toast('ランキングと全期間最高Xパワーを読み直しました。');});
+  $('reload-button').addEventListener('click',async()=>{state.dataCache.clear();state.loadedRules.clear();state.allRows=[];state.index=null;state.hourlyIndex=null;state.allTimeIndex=null;state.nameIndex=null;state.nameIndexPromise=null;state.weaponRankingRows=[];state.weaponArchiveStats=null;state.weaponArchiveLoadPromise=null;state.weaponArchiveLoadError='';await Promise.all([loadIndex(),loadAllTimeRanking(true),loadFestRankings(true)]);if(state.currentPage==='weapons')loadAllArchiveWeaponRanking(true).then(renderWeaponRanking).catch(()=>renderWeaponRanking());toast('ランキングと全期間最高Xパワーを読み直しました。');});
   setActivePage('ranking', false);
   setPlayerSubpage('overview', false);
   loadIndex();
   loadAllTimeRanking();
+  loadFestRankings();
 })();

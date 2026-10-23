@@ -138,3 +138,6 @@ body{background:#f4f5f7!important;font-size:13px;line-height:1.5}
 
 /* v11: same-season usage filter */
 .weapon-usage-scale{justify-content:space-between}
+
+/* Festival archive controls */
+.fest-controls{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px;padding:0 16px 12px}.fest-controls>div{min-width:0}@media(max-width:600px){.fest-controls{grid-template-columns:1fr;padding:0 10px 10px}}

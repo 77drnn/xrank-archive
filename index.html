@@ -9,7 +9,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon-180.png">
-  <meta name="description" content="Splatoon 3 Xマッチランキングのシーズン別アーカイブ・プレイヤー推移検索">
+  <meta name="description" content="Splatoon 3のXランキング・フェスランキング・プレイヤー履歴アーカイブ">
   <title>X RANK ARCHIVE | Splatoon 3</title>
   <link rel="stylesheet" href="style.css?v=10">
 </head>
@@ -24,6 +24,7 @@
         <button type="button" class="nav-button active" data-page-nav="ranking" aria-current="page">ランキング</button>
         <button type="button" class="nav-button" data-page-nav="alltime">全期間ベスト</button>
         <button type="button" class="nav-button" data-page-nav="weapons">ブキ別ベスト</button>
+        <button type="button" class="nav-button" data-page-nav="fest">フェスランキング</button>
         <button type="button" class="nav-button" data-page-nav="player" disabled>プレイヤー履歴</button>
       </nav>
       <div class="top-actions">
@@ -96,6 +97,30 @@
         </section>
       </section>
 
+      <section class="alltime-section page-view page-hidden" data-page="fest" aria-label="フェスランキング">
+        <div class="alltime-card">
+          <div class="alltime-heading"><div><p class="eyebrow">SPLATFEST / JP</p><h2>フェスランキング</h2><p class="results-subtitle">公開されている日本地域のフェスランキングと、歴代フェスパワーの最高記録を表示します。</p></div><span id="fest-updated" class="alltime-updated">フェスデータ読込待ち</span></div>
+          <div id="fest-view-tabs" class="alltime-tabs" role="group" aria-label="フェスランキングの種類">
+            <button type="button" data-fest-view="event" class="alltime-tab active">各フェス <span>JP</span></button>
+            <button type="button" data-fest-view="alltime" class="alltime-tab">歴代フェスパワー <span>TOP 1000</span></button>
+          </div>
+          <div id="fest-event-panel">
+            <div class="fest-controls" style="margin-top: 16px;">
+              <div><label class="field-label" for="fest-select">フェス</label><select id="fest-select" class="field-control"><option value="">読み込み中…</option></select></div>
+              <div><label class="field-label" for="fest-team-select">陣営</label><select id="fest-team-select" class="field-control"><option value="all">全陣営</option></select></div>
+            </div>
+            <div class="results-header"><div><p class="eyebrow">FESTIVAL RESULTS</p><h3 id="fest-result-title">フェスランキング</h3><p id="fest-result-subtitle" class="results-subtitle">フェスを選んで表示</p></div></div>
+            <div class="table-scroll"><table class="rank-table"><thead><tr><th class="rank-col">順位</th><th>プレイヤー</th><th class="power-col">フェスパワー</th><th>陣営</th></tr></thead><tbody id="fest-ranking-body"><tr><td colspan="4" class="empty-state">フェスデータを読み込んでいます。</td></tr></tbody></table></div>
+            <div class="table-footer"><span id="fest-ranking-footer">出典：splatoon3.ink</span><span>プレイヤーを選ぶと過去フェスの順位を確認できます</span></div>
+          </div>
+          <div id="fest-alltime-panel" class="page-hidden">
+            <p class="alltime-definition">公開されたフェスランキングに掲載された各プレイヤーの最高フェスパワーを集計し、上位1000件を表示します。同じ識別子の記録は最高値1件にまとめます。</p>
+            <div class="table-scroll"><table class="rank-table alltime-table"><thead><tr><th class="rank-col">順位</th><th>プレイヤー</th><th class="power-col">最高フェスパワー</th><th>フェス</th><th>陣営</th><th>当時順位</th></tr></thead><tbody id="fest-alltime-body"><tr><td colspan="6" class="empty-state">歴代ランキングを読み込んでいます。</td></tr></tbody></table></div>
+            <div class="table-footer"><span id="fest-alltime-footer">歴代フェスパワー TOP 1000</span><span>プレイヤーを選ぶと過去フェスの順位を確認できます</span></div>
+          </div>
+        </div>
+      </section>
+
       <section class="alltime-section page-view page-hidden" data-page="alltime" aria-label="全期間最高Xパワーランキング">
         <div class="alltime-card">
           <div class="alltime-heading"><div><p class="eyebrow">ALL-TIME PERSONAL BEST</p><h2>全期間最高Xパワーランキング</h2><p class="results-subtitle">公開元に残っているPシーズン全期間のランキングを横断。各ルールはプレイヤーごとの最高記録を500人、総合は各プレイヤーの4ルール中最高XPを1件ずつ採用して1000人表示。</p></div><span id="alltime-updated" class="alltime-updated">集計データ読込待ち</span></div>
@@ -134,19 +159,21 @@
           <button type="button" class="player-subnav-button" data-player-subnav="names">名前履歴</button>
           <button type="button" class="player-subnav-button" data-player-subnav="hourly">時間別</button>
           <button type="button" class="player-subnav-button" data-player-subnav="seasons">シーズン記録</button>
+          <button type="button" class="player-subnav-button" data-player-subnav="festivals">フェス記録</button>
         </nav>
         <div class="player-kpis player-view-section" data-player-view="overview" id="player-kpis"></div>
         <div class="chart-card player-view-section" data-player-view="overview"><div class="chart-heading"><div><h3>シーズン別 Xパワー</h3><p>過去シーズンのランキング掲載記録。</p></div><select id="history-rule" class="field-control compact"><option value="splatzones">エリア</option><option value="towercontrol">ヤグラ</option><option value="rainmaker">ホコ</option><option value="clamblitz">アサリ</option></select></div><div id="history-chart" class="history-chart"><div class="chart-empty">プレイヤーを選択してください。</div></div></div>
         <div class="chart-card archived-history-card player-view-section player-section-hidden" data-player-view="archive"><div class="chart-heading"><div><h3>公開アーカイブの順位・XP推移</h3><p id="archive-history-meta">公開元の全アーカイブから、変化があったPシーズンの順位・XPを読み込みます。</p></div></div><div id="archive-chart" class="history-chart"><div class="chart-empty">プレイヤーを選択してください。</div></div><div class="table-scroll"><table class="history-table"><thead><tr><th>取得日</th><th>シーズン</th><th>順位</th><th>Xパワー</th><th>名前</th><th>ブキ</th></tr></thead><tbody id="archive-history-body"><tr><td colspan="6" class="empty-state">アーカイブ履歴を確認しています。</td></tr></tbody></table></div></div>
         <div class="chart-card name-history-card player-view-section player-section-hidden" data-player-view="names"><div class="chart-heading"><div><h3>過去の名前一覧</h3><p>アーカイブ内で同じプレイヤー識別子に紐づいた名前。確認された順に表示します。</p></div></div><div id="player-name-history" class="player-name-history"><div class="chart-empty">名前の履歴を読み込んでいます。</div></div></div>
         <div class="chart-card hourly-card player-view-section player-section-hidden" data-player-view="hourly"><div class="chart-heading"><div><h3>現在シーズンの時間別変化</h3><p id="hourly-meta">クラウド収集後、最新Pシーズンのランキングに変化があった記録を表示します。</p></div></div><div id="hourly-chart" class="history-chart"><div class="chart-empty">時間別の記録を読み込み中…</div></div><div class="table-scroll hourly-table-wrap"><table class="history-table"><thead><tr><th>取得日時</th><th>順位</th><th>Xパワー</th><th>ブキ</th></tr></thead><tbody id="hourly-body"><tr><td colspan="4" class="empty-state">時間別データを確認しています。</td></tr></tbody></table></div></div>
+        <div class="chart-card player-view-section player-section-hidden" data-player-view="festivals"><div class="chart-heading"><div><h3>過去フェスの順位・フェスパワー</h3><p id="player-fest-history-meta">公開されているJPフェスランキング内の記録。</p></div></div><div class="table-scroll"><table class="history-table"><thead><tr><th>フェス</th><th>陣営</th><th>順位</th><th>フェスパワー</th></tr></thead><tbody id="player-fest-history-body"><tr><td colspan="4" class="empty-state">フェス記録を読み込んでいます。</td></tr></tbody></table></div></div>
         <div class="history-table-wrap player-view-section player-section-hidden" data-player-view="seasons"><h3>シーズンごとの記録</h3><div class="table-scroll"><table class="history-table"><thead><tr><th>シーズン</th><th>順位</th><th>Xパワー</th><th>順位変動</th><th>ブキ</th></tr></thead><tbody id="history-body"></tbody></table></div></div>
       </section>
 
       <footer class="footer"><div class="brand brand-footer"><span class="brand-mark">X</span><span><strong>X RANK ARCHIVE</strong><small>COMMUNITY PROJECT</small></span></div><p>非公式ファンメイドツール。任天堂およびSplatoon 3とは関係ありません。<br>取得できる範囲・項目はデータ提供元の公開状況に依存します。</p></footer>
     </main>
   </div>
-  <script src="app.js?v=12"></script>
-  <script>if ('serviceWorker' in navigator && location.protocol !== 'file:') { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js?v=12').catch(() => {})); }</script>
+  <script src="app.js?v=13"></script>
+  <script>if ('serviceWorker' in navigator && location.protocol !== 'file:') { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js?v=13').catch(() => {})); }</script>
 </body>
 </html>

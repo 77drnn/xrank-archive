@@ -57,6 +57,9 @@ jobs:
       - name: Import missing P-season source rankings from splatoon3.ink
         run: python scripts/import_missing_p_seasons.py
 
+      - name: Import Japanese festival rankings and build all-time festival top 1000
+        run: python scripts/import_fest_rankings.py
+
       - name: Set up Node.js for weapon ranking aggregation
         uses: actions/setup-node@v4
         with:
