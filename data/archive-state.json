@@ -1498,5 +1498,6 @@
   "latest_archive_day": "2026-10-22",
   "backfill_started": true,
   "backfill_complete": true,
+  "backfill_remaining_days": 0,
   "history_format_version": 2
 }
