@@ -12,9 +12,11 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
+from urllib.parse import urljoin, urlparse, unquote
 
 ROOT = Path(__file__).resolve().parents[1]
-INDEX_URL = "https://assets.splatoon3.ink/data/xrank/"
+DATA_ROOT_URL = "https://assets.splatoon3.ink/data/"
+DATA_ROOT_HOST = "assets.splatoon3.ink"
 SOURCE_DIR = ROOT / "data" / "source-fest-jp"
 OUTPUT = ROOT / "data" / "fest-rankings.json"
 
@@ -23,7 +25,7 @@ class Links(HTMLParser):
     def handle_starttag(self, tag, attrs):
         if tag.lower() == "a":
             href = dict(attrs).get("href")
-            if href: self.hrefs.append(href.rsplit("/",1)[-1])
+            if href: self.hrefs.append(href)
 
 def get(url: str) -> bytes:
     req = Request(url, headers={"User-Agent":"xrank-archive-festival-collector/1.0"})
@@ -36,6 +38,61 @@ def is_jp_fest_file(name: str) -> bool:
     # Include JP-labelled files and locale-neutral files; exclude explicitly non-JP regions.
     if re.search(r"(?:^|[._-])(en|us|eu|ap|na|kr|tw|hk)(?:[._-]|$)", low): return False
     return True
+
+def is_relevant_directory(url: str) -> bool:
+    """Only crawl the data root and subdirectories related to X/festival rankings."""
+    parsed = urlparse(url)
+    if parsed.netloc.lower() != DATA_ROOT_HOST or not parsed.path.startswith("/data/"):
+        return False
+    relative = parsed.path[len("/data/"):].strip("/").lower()
+    if not relative:
+        return True
+    return any(token in part for part in relative.split("/") for token in ("xrank", "fest", "festival"))
+
+
+def discover_jp_fest_files() -> dict[str, str]:
+    """Discover festival JSON URLs starting at /data/, including relevant subfolders."""
+    pending = [DATA_ROOT_URL]
+    visited: set[str] = set()
+    files: dict[str, str] = {}
+    while pending and len(visited) < 100:
+        directory = pending.pop(0)
+        parsed_dir = urlparse(directory)
+        directory = parsed_dir._replace(query="", fragment="").geturl()
+        if not directory.endswith("/"):
+            directory += "/"
+        if directory in visited:
+            continue
+        visited.add(directory)
+        try:
+            html = get(directory).decode("utf-8", "replace")
+        except (HTTPError, URLError, TimeoutError, OSError) as exc:
+            print(f"WARN: cannot inspect directory {directory}: {exc}")
+            continue
+        parser = Links()
+        parser.feed(html)
+        for href in parser.hrefs:
+            target = urljoin(directory, href)
+            parsed = urlparse(target)
+            # Stay on the requested host and under /data/; do not follow external links.
+            if parsed.scheme not in ("https", "http") or parsed.netloc.lower() != DATA_ROOT_HOST or not parsed.path.startswith("/data/"):
+                continue
+            target = parsed._replace(query="", fragment="").geturl()
+            path = unquote(parsed.path)
+            basename = path.rstrip("/").rsplit("/", 1)[-1]
+            is_dir = parsed.path.endswith("/") or ("." not in basename)
+            if is_dir:
+                candidate_dir = target.rstrip("/") + "/"
+                if is_relevant_directory(candidate_dir) and candidate_dir not in visited:
+                    pending.append(candidate_dir)
+            elif is_jp_fest_file(basename):
+                # Keep the relative source path as key, so same-named files in different
+                # ranking folders are not silently overwritten.
+                relative_path = path[len("/data/"):]
+                files.setdefault(relative_path, target)
+    if len(visited) >= 100 and pending:
+        print("WARN: directory discovery reached its 100-directory safety limit")
+    return files
 
 def fest_key(name: str) -> str:
     key = re.sub(r"\.json$", "", name, flags=re.I)
@@ -108,33 +165,33 @@ def extract_players(data, filename: str):
 
 def main():
     SOURCE_DIR.mkdir(parents=True, exist_ok=True)
-    html=get(INDEX_URL).decode("utf-8", "replace")
-    parser=Links(); parser.feed(html)
-    names=sorted({n for n in parser.hrefs if is_jp_fest_file(n)})
-    if not names:
-        raise SystemExit(f"No festival JSON files discovered at {INDEX_URL}. Check the current upstream filename pattern.")
+    discovered=discover_jp_fest_files()
+    if not discovered:
+        raise SystemExit(f"No Japanese festival ranking JSON links discovered under {DATA_ROOT_URL}. Check whether the source exposes a directory listing and whether filenames still match the supported pattern.")
     downloaded=skipped=0; failures=[]; festivals=[]
-    for name in names:
-        dest=SOURCE_DIR/name
+    for relative_path, source_url in sorted(discovered.items()):
+        name=relative_path.rsplit("/",1)[-1]
+        dest=SOURCE_DIR / relative_path
         try:
             # Re-fetch every run so active/current festival rankings update; keep prior files when fetch fails.
-            raw=get(INDEX_URL+name)
+            raw=get(source_url)
             if not raw.lstrip().startswith(b"{"): raise ValueError("response is not a JSON object")
             parsed=json.loads(raw)
             if not isinstance(parsed,dict): raise ValueError("JSON root is not an object")
+            dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_bytes(raw); downloaded += 1
             rows=extract_players(parsed,name)
             if not rows:
-                print(f"WARN: {name}: no ranked festival-player records recognized")
+                print(f"WARN: {relative_path}: no ranked festival-player records recognized")
                 continue
             key=fest_key(name)
             # If the same festival/team is represented by multiple files, merge below.
             title = first_value(parsed, ("festivalName", "festName", "festival_name", "eventName", "event_name", "title"))
-            festivals.append({"key":key,"title":str(title or key),"region":"JP","source_file":name,"players":rows})
-            print(f"Imported {name}: {len(rows)} rows")
+            festivals.append({"key":key,"title":str(title or key),"region":"JP","source_file":relative_path,"players":rows})
+            print(f"Imported {relative_path}: {len(rows)} rows")
             time.sleep(0.1)
         except (HTTPError, URLError, TimeoutError, ValueError, OSError) as exc:
-            failures.append(f"{name}: {exc}"); print(f"WARN: {failures[-1]}")
+            failures.append(f"{relative_path}: {exc}"); print(f"WARN: {failures[-1]}")
     if not festivals:
         raise SystemExit("Festival files were found but none contained recognizable ranked player records; no output was replaced.")
     # Merge files that refer to the same festival, but retain team labels and all rows.
@@ -161,7 +218,7 @@ def main():
             best[key]=p
     top=sorted(best.values(),key=lambda p:(-p["fest_power"],p["rank"],p["name"]))[:1000]
     for i,p in enumerate(top,1): p["all_time_rank"]=i
-    output={"schema_version":1,"generated_at":datetime.now(timezone.utc).isoformat(),"region":"JP","festivals":final_fests,"all_time_top1000":top,"source_url":INDEX_URL,"downloaded_files":downloaded,"failed_files":failures}
+    output={"schema_version":1,"generated_at":datetime.now(timezone.utc).isoformat(),"region":"JP","festivals":final_fests,"all_time_top1000":top,"source_url":DATA_ROOT_URL,"downloaded_files":downloaded,"failed_files":failures}
     OUTPUT.parent.mkdir(parents=True,exist_ok=True)
     tmp=OUTPUT.with_suffix(".json.tmp"); tmp.write_text(json.dumps(output,ensure_ascii=False,separators=(",",":")),encoding="utf-8"); tmp.replace(OUTPUT)
     print(f"Wrote {OUTPUT}: festivals={len(final_fests)}, placements={len(all_players)}, all-time top={len(top)}, downloaded={downloaded}, failed={len(failures)}")
