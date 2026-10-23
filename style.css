@@ -141,3 +141,25 @@ body{background:#f4f5f7!important;font-size:13px;line-height:1.5}
 
 /* Festival archive controls */
 .fest-controls{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px;padding:0 16px 12px}.fest-controls>div{min-width:0}@media(max-width:600px){.fest-controls{grid-template-columns:1fr;padding:0 10px 10px}}
+
+
+/* Sticky top navigation: X and festival rankings share one persistent menu. */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: auto;
+  min-height: 72px;
+  flex-wrap: wrap;
+  background: rgba(255,255,255,.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+@media (max-width: 950px) {
+  .topbar { min-height: 0; }
+}
+@media (max-width: 760px) {
+  .topbar { padding-top: 8px; padding-bottom: 7px; row-gap: 5px; }
+  .primary-nav { order: 3; width: 100%; flex: 0 0 100%; }
+  .nav-button { min-width: max-content; flex: 0 0 auto; }
+}

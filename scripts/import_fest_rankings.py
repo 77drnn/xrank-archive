@@ -6,7 +6,7 @@ picked up without maintaining a hard-coded festival list. The source has changed
 conventions over time; parsing is deliberately tolerant and logs unknown files/records.
 """
 from __future__ import annotations
-import json, re, time
+import base64, json, re, time
 from datetime import datetime, timezone
 from html.parser import HTMLParser
 from pathlib import Path
@@ -113,6 +113,28 @@ def first_value(obj: dict, keys: tuple[str, ...]):
             return obj[k]
     return None
 
+def xrank_compatible_player_key(stable_id, name_id, name: str) -> str:
+    """Prefer the same identity conventions as the X-ranking archive when possible."""
+    if stable_id not in (None, ""):
+        raw = str(stable_id).strip()
+        if raw.startswith(("uid:", "nameId:", "id:")):
+            return raw
+        # X-ranking IDs may be URL-safe base64 GraphQL IDs containing `:u-<uid>`.
+        try:
+            decoded = base64.urlsafe_b64decode(raw + "=" * (-len(raw) % 4)).decode("utf-8", "ignore")
+            match = re.search(r":u-([^:]+)$", decoded)
+            if match:
+                return "uid:" + match.group(1)
+        except (ValueError, UnicodeError):
+            pass
+        # If nameId is available, it is the most practical cross-feed join key
+        # when the opaque source ID cannot be decoded into the X archive's UID.
+        if name_id in (None, ""):
+            return "id:" + raw
+    if name_id not in (None, ""):
+        return "nameId:" + str(name_id).strip()
+    return "name:" + str(name or "").strip()
+
 def display_text(value):
     if isinstance(value, str): return value
     if isinstance(value, dict):
@@ -141,12 +163,13 @@ def extract_players(data, filename: str):
                     if rank_num > 0 and power_num > 0:
                         name=str(name).strip()
                         name_id=first_value(node, ("nameId", "name_id", "discriminator", "nameID"))
-                        stable_id=first_value(node, ("player_key", "playerKey", "playerId", "player_id", "uniqueId", "unique_id"))
+                        stable_id=first_value(node, ("player_key", "playerKey", "playerId", "player_id", "uniqueId", "unique_id", "id"))
                         team_value=team or display_text(first_value(node, ("team", "faction", "side")))
-                        # Public ranking feeds do not always expose a persistent account ID.
-                        identity = str(stable_id) if stable_id is not None else (f"nameId:{name_id}|name:{name}" if name_id is not None else f"name:{name}")
+                        # Use the X archive's key format where possible, so festival and
+                        # X ranking entries can resolve to the same shared player page.
+                        identity = xrank_compatible_player_key(stable_id, name_id, name)
                         found.append({
-                            "player_key": f"fest-player:{identity}", "name": name,
+                            "player_key": identity, "name": name,
                             "name_id": str(name_id or ""), "rank": rank_num,
                             "fest_power": round(power_num, 1), "team": team_value or "陣営不明",
                             "source_file": filename,

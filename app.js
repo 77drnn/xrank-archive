@@ -119,6 +119,57 @@
     return `<span class="rank-number ${cl}">${fmt(r)}</span>`;
   }
   function nodeKey(row) { return String(row.player_key || row.id || (row.name_id ? `nameId:${row.name_id}` : `name:${row.name || ''}`)); }
+  function playerNameId(row) {
+    return String(row?.name_id ?? row?.discriminator ?? row?.nameId ?? '').trim();
+  }
+  function normalizedPlayerName(value) {
+    return String(value ?? '').normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('ja');
+  }
+  function isFestOnlyKey(key) { return String(key || '').startsWith('fest-player:'); }
+  function isFestivalRow(row) { return Boolean(row && (row.festival_key != null || row.fest_power != null)); }
+  function isSamePlayer(a, b) {
+    if (!a || !b) return false;
+    const aKey = nodeKey(a), bKey = nodeKey(b);
+    if (aKey && bKey && aKey === bKey) return true;
+    const aId = playerNameId(a), bId = playerNameId(b);
+    if (aId && bId) return aId === bId;
+    const aName = normalizedPlayerName(a.name), bName = normalizedPlayerName(b.name);
+    if (!aName || aName !== bName) return false;
+    // A name-only join is allowed only while it remains unique in the collected
+    // records. Conflicting nameIds or multiple same-name players must not merge.
+    const peers = [...state.rows, ...state.allRows, ...state.allTimeRows, ...state.festRows]
+      .filter(row => normalizedPlayerName(row?.name) === aName);
+    const expectedIds = [aId, bId].filter(Boolean);
+    if (peers.some(row => {
+      const id = playerNameId(row);
+      return id && expectedIds.some(expected => expected !== id);
+    })) return false;
+    const xKeys = new Set(peers.filter(row => !isFestivalRow(row)).map(nodeKey));
+    const festKeys = new Set(peers.filter(isFestivalRow).map(nodeKey));
+    return xKeys.size <= 1 && festKeys.size <= 1;
+  }
+  function knownXPlayerRows() {
+    const rows = [...state.rows, ...state.allRows, ...state.allTimeRows];
+    return [...new Map(rows.filter(Boolean).map(row => [nodeKey(row), row])).values()];
+  }
+  function findMatchingXPlayer(row, keyHint = '') {
+    const candidates = knownXPlayerRows();
+    if (keyHint && !isFestOnlyKey(keyHint)) {
+      const exact = candidates.find(candidate => nodeKey(candidate) === String(keyHint));
+      if (exact) return exact;
+    }
+    const nameId = playerNameId(row);
+    if (nameId) {
+      const byId = candidates.find(candidate => playerNameId(candidate) === nameId);
+      if (byId) return byId;
+    }
+    // Match by display name only if it identifies one unambiguous X player.
+    const targetName = normalizedPlayerName(row?.name);
+    if (!targetName) return null;
+    const matches = candidates.filter(candidate => normalizedPlayerName(candidate.name) === targetName && isSamePlayer(row, candidate));
+    const uniqueKeys = [...new Set(matches.map(nodeKey))];
+    return uniqueKeys.length === 1 ? matches[0] : null;
+  }
   function playerHistoryShard(playerKey) {
     let hash = 2166136261;
     const bytes = new TextEncoder().encode(String(playerKey));
@@ -278,7 +329,7 @@
   function renderFestHistory() {
     if (!state.currentPlayer) return;
     const key = state.currentPlayer.key;
-    const rows = state.festRows.filter(p => String(p.player_key || '') === key)
+    const rows = state.festRows.filter(p => isSamePlayer(p, state.currentPlayer))
       .sort((a,b)=>String(b.festival_key).localeCompare(String(a.festival_key),'ja',{numeric:true}) || Number(a.rank)-Number(b.rank));
     const body = $('player-fest-history-body');
     if (!body) return;
@@ -564,17 +615,44 @@
   }
   async function showPlayer(key) {
     if (state.currentPage !== 'player') state.previousPage = state.currentPage || 'ranking';
-    const selectedRow = state.rows.find(p => nodeKey(p) === key) || state.allRows.find(p => nodeKey(p) === key) || state.allTimeRows.find(p => nodeKey(p) === key) || state.festRows.find(p => nodeKey(p) === key);
+    const requestedKey = String(key);
+    // Ensure the all-time X index is available before trying to connect a festival entry
+    // to its corresponding X-ranking identity.
+    if (!state.allTimeIndex) await loadAllTimeRanking();
+    const allKnownRows = [...state.rows, ...state.allRows, ...state.allTimeRows, ...state.festRows];
+    const requestedRow = allKnownRows.find(p => nodeKey(p) === requestedKey);
+    let selectedRow = requestedRow;
+    let profileKey = requestedKey;
+    if (requestedRow) {
+      const xRecord = findMatchingXPlayer(requestedRow, requestedKey);
+      if (xRecord) {
+        selectedRow = xRecord;
+        profileKey = nodeKey(xRecord);
+      } else {
+        profileKey = nodeKey(requestedRow);
+      }
+    }
     const idx = await loadPlayerNameIndex();
-    const nameMeta = idx.players?.[key];
+    // If this festival entry was not present in the current/all-time X lists, use
+    // the archive's full player-name index as a fallback join on nameId.
+    if (requestedRow && !selectedRow?.rule && !selectedRow?.season) {
+      const requestedNameId = playerNameId(requestedRow);
+      if (requestedNameId) {
+        const historyKeys = Object.entries(idx.players || {})
+          .filter(([, meta]) => String(meta?.name_id || '').trim() === requestedNameId)
+          .map(([historyKey]) => historyKey);
+        if (historyKeys.length === 1) profileKey = historyKeys[0];
+      }
+    }
+    const nameMeta = idx.players?.[profileKey] || idx.players?.[requestedKey];
     if (!selectedRow && !nameMeta) return;
     state.currentPlayer = {
-      key,
-      name:selectedRow?.name || nameMeta?.name || '名前不明',
-      name_id:selectedRow?.name_id || selectedRow?.discriminator || nameMeta?.name_id || ''
+      key: profileKey,
+      name:selectedRow?.name || requestedRow?.name || nameMeta?.name || '名前不明',
+      name_id:playerNameId(selectedRow) || playerNameId(requestedRow) || nameMeta?.name_id || ''
     };
     $('player-title').textContent = state.currentPlayer.name;
-    $('player-meta').textContent = `ランキング識別子: ${key}${state.currentPlayer.name_id ? ` · nameId: ${state.currentPlayer.name_id}` : ''}`;
+    $('player-meta').textContent = `統合プレイヤーID: ${profileKey}${state.currentPlayer.name_id ? ` · nameId: ${state.currentPlayer.name_id}` : ''}`;
     $('history-rule').value = state.selectedRule;
     $('player-panel').classList.remove('hidden');
     setActivePage('player', false);
