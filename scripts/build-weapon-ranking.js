@@ -62,6 +62,26 @@ function canonicalWeapon(raw) {
   return groupLookup.get(norm(ja)) || groupLookup.get(norm(cleaned)) || ja;
 }
 
+// Same-person aggregation uses only permanent source identifiers. Four-digit
+// nameId values, names, and ranks are never used as identity fallbacks.
+function persistentPlayerKey(value) {
+  const raw = String(value ?? '').trim();
+  if (!raw) return '';
+  if (/^uid:[^:]+$/i.test(raw)) return `uid:${raw.slice(4)}`;
+  if (/^(?:nameId|name|fest-player|unidentified|unverified|record):/i.test(raw)) return '';
+  if (/^id:/i.test(raw)) {
+    const inner = raw.slice(3).trim();
+    return inner && !/^\d{4}$/.test(inner) ? `id:${inner}` : '';
+  }
+  if (/^\d{4}$/.test(raw)) return '';
+  try {
+    const decoded = Buffer.from(raw, 'base64url').toString('utf8');
+    const match = decoded.match(/:u-([^:]+)$/);
+    if (match) return `uid:${match[1]}`;
+  } catch (_) { /* Treat non-base64 source IDs as opaque. */ }
+  return `id:${raw}`;
+}
+
 function listJsonl(dir) {
   const found = [];
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -100,14 +120,17 @@ for (const file of files) {
       if (!['splatzones', 'towercontrol', 'rainmaker', 'clamblitz'].includes(rule)) continue;
       for (const event of (Array.isArray(day.events) ? day.events : [])) {
         if (!Array.isArray(event) || event.length < 6) continue;
-        const playerKey = String(event[1] ?? '');
+        const rawPlayerKey = String(event[1] ?? '');
+        const playerKey = persistentPlayerKey(rawPlayerKey);
         const rawWeapon = event[5];
         const power = Number(event[4]);
-        if (!playerKey || rawWeapon == null || rawWeapon === '' || !Number.isFinite(power)) continue;
+        if (rawWeapon == null || rawWeapon === '' || !Number.isFinite(power)) continue;
         const weapon = canonicalWeapon(rawWeapon);
         archiveSeasonRules.add(`${season}\u0000${rule}`);
         totalRows++;
         usage.set(weapon, (usage.get(weapon) || 0) + 1);
+        // Keep global weapon counts, but don't create player rows from non-unique keys.
+        if (!playerKey) continue;
         const playerSeasonRuleKey = JSON.stringify([playerKey, String(season), rule]);
         let seasonUsage = playerSeasonRuleUsage.get(playerSeasonRuleKey);
         if (!seasonUsage) { seasonUsage = { total: 0, weapons: new Map() }; playerSeasonRuleUsage.set(playerSeasonRuleKey, seasonUsage); }
@@ -178,11 +201,12 @@ for (const file of listJson(sourceXrankRoot)) {
       const power = Number(p?.xPower);
       const rawWeapon = p?.weapon?.name;
       if (!p || !Number.isFinite(power) || !rawWeapon) continue;
-      const playerKey = String(p.id || `${season}:${rule}:${p.nameId || p.name || p.rank}`);
+      const playerKey = persistentPlayerKey(p.id);
       const weapon = canonicalWeapon(rawWeapon);
       totalRows++;
       importedRows++;
       usage.set(weapon, (usage.get(weapon) || 0) + 1);
+      if (!playerKey) continue;
       const playerSeasonRuleKey = JSON.stringify([playerKey, String(season), rule]);
       let seasonUsage = playerSeasonRuleUsage.get(playerSeasonRuleKey);
       if (!seasonUsage) { seasonUsage = { total: 0, weapons: new Map() }; playerSeasonRuleUsage.set(playerSeasonRuleKey, seasonUsage); }

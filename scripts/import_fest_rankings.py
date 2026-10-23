@@ -6,7 +6,7 @@ picked up without maintaining a hard-coded festival list. The source has changed
 conventions over time; parsing is deliberately tolerant and logs unknown files/records.
 """
 from __future__ import annotations
-import base64, json, re, time
+import base64, hashlib, json, re, time
 from datetime import datetime, timezone
 from html.parser import HTMLParser
 from pathlib import Path
@@ -113,27 +113,38 @@ def first_value(obj: dict, keys: tuple[str, ...]):
             return obj[k]
     return None
 
-def xrank_compatible_player_key(stable_id, name_id, name: str) -> str:
-    """Prefer the same identity conventions as the X-ranking archive when possible."""
-    if stable_id not in (None, ""):
-        raw = str(stable_id).strip()
-        if raw.startswith(("uid:", "nameId:", "id:")):
-            return raw
-        # X-ranking IDs may be URL-safe base64 GraphQL IDs containing `:u-<uid>`.
-        try:
-            decoded = base64.urlsafe_b64decode(raw + "=" * (-len(raw) % 4)).decode("utf-8", "ignore")
-            match = re.search(r":u-([^:]+)$", decoded)
-            if match:
-                return "uid:" + match.group(1)
-        except (ValueError, UnicodeError):
-            pass
-        # If nameId is available, it is the most practical cross-feed join key
-        # when the opaque source ID cannot be decoded into the X archive's UID.
-        if name_id in (None, ""):
-            return "id:" + raw
-    if name_id not in (None, ""):
-        return "nameId:" + str(name_id).strip()
-    return "name:" + str(name or "").strip()
+def xrank_compatible_player_key(stable_id) -> str | None:
+    """Return only a permanent source identifier; never fall back to four-digit nameId."""
+    if stable_id in (None, ""):
+        return None
+    raw = str(stable_id).strip()
+    if not raw or re.fullmatch(r"\d{4}", raw):
+        return None
+    if raw.startswith("uid:"):
+        return raw
+    if raw.startswith("id:"):
+        inner = raw[3:].strip()
+        if not inner or re.fullmatch(r"\d{4}", inner):
+            return None
+        return "id:" + inner
+    if raw.startswith(("nameId:", "name:", "fest-player:", "unidentified:")):
+        return None
+    # splatoon3.ink IDs may be URL-safe base64 GraphQL IDs containing :u-<uid>.
+    try:
+        decoded = base64.urlsafe_b64decode(raw + "=" * (-len(raw) % 4)).decode("utf-8", "ignore")
+        match = re.search(r":u-([^:]+)$", decoded)
+        if match:
+            return "uid:" + match.group(1)
+    except (ValueError, UnicodeError):
+        pass
+    # The raw ID is still a source identifier even when its UID token is opaque.
+    return "id:" + raw
+
+
+def unverified_record_key(source_file: str, path: tuple, rank_num: int, power_num: float, team: str) -> str:
+    """Unique record key for entries with no ID; it must never join different records."""
+    material = "\0".join((source_file, "/".join(path), str(rank_num), str(power_num), team))
+    return "unidentified:" + hashlib.sha256(material.encode("utf-8")).hexdigest()[:24]
 
 def display_text(value):
     if isinstance(value, str): return value
@@ -163,11 +174,18 @@ def extract_players(data, filename: str):
                     if rank_num > 0 and power_num > 0:
                         name=str(name).strip()
                         name_id=first_value(node, ("nameId", "name_id", "discriminator", "nameID"))
-                        stable_id=first_value(node, ("player_key", "playerKey", "playerId", "player_id", "uniqueId", "unique_id", "id"))
+                        stable_id_keys = ("player_key", "playerKey", "playerId", "player_id", "uniqueId", "unique_id", "id")
                         team_value=team or display_text(first_value(node, ("team", "faction", "side")))
-                        # Use the X archive's key format where possible, so festival and
-                        # X ranking entries can resolve to the same shared player page.
-                        identity = xrank_compatible_player_key(stable_id, name_id, name)
+                        # Try each possible source-ID field, skipping nameId-like/4-digit values.
+                        # The 4-digit nameId and display name are metadata, never identity keys.
+                        identity = None
+                        for stable_id_key in stable_id_keys:
+                            candidate = xrank_compatible_player_key(node.get(stable_id_key))
+                            if candidate:
+                                identity = candidate
+                                break
+                        if not identity:
+                            identity = unverified_record_key(filename, path, rank_num, power_num, team_value or "陣営不明")
                         found.append({
                             "player_key": identity, "name": name,
                             "name_id": str(name_id or ""), "rank": rank_num,
@@ -203,7 +221,7 @@ def main():
             if not isinstance(parsed,dict): raise ValueError("JSON root is not an object")
             dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_bytes(raw); downloaded += 1
-            rows=extract_players(parsed,name)
+            rows=extract_players(parsed,relative_path)
             if not rows:
                 print(f"WARN: {relative_path}: no ranked festival-player records recognized")
                 continue

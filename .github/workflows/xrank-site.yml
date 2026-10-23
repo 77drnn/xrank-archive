@@ -43,6 +43,9 @@ jobs:
       - name: Install archive compression dependency
         run: python -m pip install -r requirements.txt
 
+      - name: Enforce permanent player identifiers only
+        run: python scripts/strictify_xrank_identity.py
+
       - name: Fetch the newest X ranking for all four rules
         shell: bash
         run: |

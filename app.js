@@ -118,57 +118,67 @@
     const cl = r === 1 ? 'gold' : r === 2 ? 'silver' : r === 3 ? 'bronze' : '';
     return `<span class="rank-number ${cl}">${fmt(r)}</span>`;
   }
-  function nodeKey(row) { return String(row.player_key || row.id || (row.name_id ? `nameId:${row.name_id}` : `name:${row.name || ''}`)); }
   function playerNameId(row) {
+    // This is display metadata only. It must never participate in identity matching.
     return String(row?.name_id ?? row?.discriminator ?? row?.nameId ?? '').trim();
   }
-  function normalizedPlayerName(value) {
-    return String(value ?? '').normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('ja');
+  function identityValue(value) {
+    const raw = String(value ?? '').trim();
+    if (!raw) return '';
+    if (/^uid:[^:]+$/i.test(raw)) return `uid:${raw.slice(4)}`;
+    if (/^(?:nameId|name|fest-player|unidentified|record|unverified):/i.test(raw)) return '';
+    if (/^id:/i.test(raw)) {
+      const inner = raw.slice(3).trim();
+      if (!inner || /^\d{4}$/.test(inner)) return '';
+      return `id:${inner}`;
+    }
+    // The four-digit nameId/player display number is not a durable identifier.
+    if (/^\d{4}$/.test(raw)) return '';
+    // splatoon3.ink's XRankingHolder.id is usually an opaque base64url ID
+    // encoding a UID. Decode that UID so it matches archive and festival rows.
+    try {
+      let encoded = raw.replace(/-/g, '+').replace(/_/g, '/');
+      encoded += '='.repeat((4 - encoded.length % 4) % 4);
+      const binary = atob(encoded);
+      const bytes = Uint8Array.from(binary, ch => ch.charCodeAt(0));
+      const decoded = new TextDecoder().decode(bytes);
+      const match = decoded.match(/:u-([^:]+)$/);
+      if (match) return `uid:${match[1]}`;
+    } catch (_) { /* Raw IDs may not be base64; retain the source identifier below. */ }
+    return `id:${raw}`;
   }
-  function isFestOnlyKey(key) { return String(key || '').startsWith('fest-player:'); }
+  function identityKey(row) {
+    if (!row) return '';
+    const candidates = [row.identity_key, row.player_key, row.id, row.identifier, row.playerId, row.player_id, row.uniqueId, row.unique_id];
+    for (const value of candidates) {
+      const key = identityValue(value);
+      if (key) return key;
+    }
+    return '';
+  }
+  function recordKey(row) {
+    // When the source has no permanent identifier, key only the displayed record
+    // so the UI can open a page; these record keys are never used to join history.
+    const values = isFestivalRow(row)
+      ? ['festival', row?.festival_key, row?.source_file, row?.rank, row?.team, row?.fest_power, row?.all_time_rank, row?.name]
+      : ['xrank', row?.season, row?.rule, row?.at, row?.date, row?.rank, row?.rank_at_record, row?.all_time_rank, row?.x_power, row?.weapon, row?.weapon_label, row?.name];
+    return `unverified:${values.map(value => encodeURIComponent(String(value ?? ''))).join(':')}`;
+  }
+  function nodeKey(row) { return identityKey(row) || recordKey(row); }
   function isFestivalRow(row) { return Boolean(row && (row.festival_key != null || row.fest_power != null)); }
   function isSamePlayer(a, b) {
-    if (!a || !b) return false;
-    const aKey = nodeKey(a), bKey = nodeKey(b);
-    if (aKey && bKey && aKey === bKey) return true;
-    const aId = playerNameId(a), bId = playerNameId(b);
-    if (aId && bId) return aId === bId;
-    const aName = normalizedPlayerName(a.name), bName = normalizedPlayerName(b.name);
-    if (!aName || aName !== bName) return false;
-    // A name-only join is allowed only while it remains unique in the collected
-    // records. Conflicting nameIds or multiple same-name players must not merge.
-    const peers = [...state.rows, ...state.allRows, ...state.allTimeRows, ...state.festRows]
-      .filter(row => normalizedPlayerName(row?.name) === aName);
-    const expectedIds = [aId, bId].filter(Boolean);
-    if (peers.some(row => {
-      const id = playerNameId(row);
-      return id && expectedIds.some(expected => expected !== id);
-    })) return false;
-    const xKeys = new Set(peers.filter(row => !isFestivalRow(row)).map(nodeKey));
-    const festKeys = new Set(peers.filter(isFestivalRow).map(nodeKey));
-    return xKeys.size <= 1 && festKeys.size <= 1;
+    // Strict identity equality only; never join by name, nameId, rank, or power.
+    const aKey = identityKey(a), bKey = identityKey(b);
+    return Boolean(aKey && bKey && aKey === bKey);
   }
   function knownXPlayerRows() {
     const rows = [...state.rows, ...state.allRows, ...state.allTimeRows];
     return [...new Map(rows.filter(Boolean).map(row => [nodeKey(row), row])).values()];
   }
   function findMatchingXPlayer(row, keyHint = '') {
-    const candidates = knownXPlayerRows();
-    if (keyHint && !isFestOnlyKey(keyHint)) {
-      const exact = candidates.find(candidate => nodeKey(candidate) === String(keyHint));
-      if (exact) return exact;
-    }
-    const nameId = playerNameId(row);
-    if (nameId) {
-      const byId = candidates.find(candidate => playerNameId(candidate) === nameId);
-      if (byId) return byId;
-    }
-    // Match by display name only if it identifies one unambiguous X player.
-    const targetName = normalizedPlayerName(row?.name);
-    if (!targetName) return null;
-    const matches = candidates.filter(candidate => normalizedPlayerName(candidate.name) === targetName && isSamePlayer(row, candidate));
-    const uniqueKeys = [...new Set(matches.map(nodeKey))];
-    return uniqueKeys.length === 1 ? matches[0] : null;
+    const requestedIdentity = identityKey(row) || identityValue(keyHint);
+    if (!requestedIdentity) return null;
+    return knownXPlayerRows().find(candidate => identityKey(candidate) === requestedIdentity) || null;
   }
   function playerHistoryShard(playerKey) {
     let hash = 2166136261;
@@ -223,6 +233,8 @@
     if ($('search-input').value.trim().toLocaleLowerCase() !== query) return;
     const hits=[];
     for (const player of Object.values(idx.players || {})) {
+      // Hide historical entries whose key was inferred from nameId/name; do not reuse them as identities.
+      if (!identityValue(player.key)) continue;
       const names = Array.isArray(player.names) ? player.names : [];
       const alias = names.find(n => String(n.name || '').toLocaleLowerCase().includes(query));
       const idHit = String(player.key || '').toLocaleLowerCase().includes(query) || String(player.name_id || '').toLocaleLowerCase().includes(query);
@@ -314,27 +326,31 @@
     $('fest-result-title').textContent = current ? (current.title || current.key) : 'フェスランキング';
     $('fest-result-subtitle').textContent = current ? `JP · ${new Set((current.players || []).map(p=>p.team)).size} 陣営 · ${eventRows.length.toLocaleString('ja-JP')} 人分` : '収録データなし';
     $('fest-ranking-body').innerHTML = eventRows.length ? eventRows.map((p,i)=>{
-      const key=String(p.player_key || `fest-player:name:${p.name || ''}`), initials=Array.from(String(p.name || '?')).slice(0,1).join('').toUpperCase();
-      return `<tr><td>${rankBadge(p.rank || i+1)}</td><td><button class="player-link" type="button" data-fest-player-key="${esc(key)}" aria-label="${esc(p.name || '名前不明')} のフェス履歴を表示"><span class="avatar">${esc(initials)}</span><span><span class="player-name">${esc(p.name || '名前不明')}</span>${p.name_id ? `<span class="player-small">ID ${esc(p.name_id)}</span>` : ''}</span></button></td><td><span class="power-value">${fmt(p.fest_power)}</span></td><td>${esc(p.team || '陣営不明')}</td></tr>`;
+      const key=nodeKey(p), initials=Array.from(String(p.name || '?')).slice(0,1).join('').toUpperCase();
+      return `<tr><td>${rankBadge(p.rank || i+1)}</td><td><button class="player-link" type="button" data-fest-player-key="${esc(key)}" aria-label="${esc(p.name || '名前不明')} のフェス履歴を表示"><span class="avatar">${esc(initials)}</span><span><span class="player-name">${esc(p.name || '名前不明')}</span>${p.name_id ? `<span class="player-small">nameId ${esc(p.name_id)}</span>` : ''}</span></button></td><td><span class="power-value">${fmt(p.fest_power)}</span></td><td>${esc(p.team || '陣営不明')}</td></tr>`;
     }).join('') : '<tr><td colspan="4" class="empty-state">このフェス・陣営のランキングデータがありません。</td></tr>';
     $('fest-ranking-footer').textContent = `${current?.title || current?.key || 'フェス'} · ${eventRows.length.toLocaleString('ja-JP')} 件 · 出典 splatoon3.ink`;
     const top = Array.isArray(data.all_time_top1000) ? data.all_time_top1000 : [];
     $('fest-alltime-body').innerHTML = top.length ? top.map((p,i)=>{
-      const key=String(p.player_key || ''), initials=Array.from(String(p.name || '?')).slice(0,1).join('').toUpperCase();
-      return `<tr><td>${rankBadge(p.all_time_rank || i+1)}</td><td><button class="player-link" type="button" data-fest-player-key="${esc(key)}" aria-label="${esc(p.name || '名前不明')} のフェス履歴を表示"><span class="avatar">${esc(initials)}</span><span><span class="player-name">${esc(p.name || '名前不明')}</span>${p.name_id ? `<span class="player-small">ID ${esc(p.name_id)}</span>` : ''}</span></button></td><td><span class="power-value">${fmt(p.fest_power)}</span></td><td>${esc(p.festival_title || p.festival_key || '—')}</td><td>${esc(p.team || '陣営不明')}</td><td>#${fmt(p.rank)}</td></tr>`;
+      const key=nodeKey(p), initials=Array.from(String(p.name || '?')).slice(0,1).join('').toUpperCase();
+      return `<tr><td>${rankBadge(p.all_time_rank || i+1)}</td><td><button class="player-link" type="button" data-fest-player-key="${esc(key)}" aria-label="${esc(p.name || '名前不明')} のフェス履歴を表示"><span class="avatar">${esc(initials)}</span><span><span class="player-name">${esc(p.name || '名前不明')}</span>${p.name_id ? `<span class="player-small">nameId ${esc(p.name_id)}</span>` : ''}</span></button></td><td><span class="power-value">${fmt(p.fest_power)}</span></td><td>${esc(p.festival_title || p.festival_key || '—')}</td><td>${esc(p.team || '陣営不明')}</td><td>#${fmt(p.rank)}</td></tr>`;
     }).join('') : '<tr><td colspan="6" class="empty-state">歴代フェスパワーのデータがありません。</td></tr>';
-    $('fest-alltime-footer').textContent = `歴代フェスパワー TOP ${top.length.toLocaleString('ja-JP')} · 同じプレイヤーは最高記録1件のみ`;
+    $('fest-alltime-footer').textContent = `歴代フェスパワー TOP ${top.length.toLocaleString('ja-JP')} · 同じ永続識別子は最高記録1件のみ`;
   }
 
   function renderFestHistory() {
     if (!state.currentPlayer) return;
-    const key = state.currentPlayer.key;
-    const rows = state.festRows.filter(p => isSamePlayer(p, state.currentPlayer))
-      .sort((a,b)=>String(b.festival_key).localeCompare(String(a.festival_key),'ja',{numeric:true}) || Number(a.rank)-Number(b.rank));
     const body = $('player-fest-history-body');
     if (!body) return;
-    body.innerHTML = rows.length ? rows.map(p=>`<tr><td>${esc(p.festival_title || p.festival_key || '—')}</td><td>${esc(p.team || '陣営不明')}</td><td>#${fmt(p.rank)}</td><td><span class="power-value">${fmt(p.fest_power)}</span></td></tr>`).join('') : '<tr><td colspan="4" class="empty-state">このプレイヤーのフェス順位は見つかりません。公開データに載ったフェスに限られます。</td></tr>';
-    $('player-fest-history-meta').textContent = `${rows.length.toLocaleString('ja-JP')} 件のフェス掲載記録 · JP公開ランキング内で一致した識別子を表示`;
+    if (!state.currentPlayer.identity_key) {
+      body.innerHTML = '<tr><td colspan="4" class="empty-state">この記録には永続識別子がありません。4桁の番号や名前から他のフェス記録を推測して紐付けることはしません。</td></tr>';
+      $('player-fest-history-meta').textContent = '識別子が取得できないため、別の記録とは統合していません。';
+      return;
+    }
+    const rows = state.festRows.filter(p => isSamePlayer(p, state.currentPlayer))
+      .sort((a,b)=>String(b.festival_key).localeCompare(String(a.festival_key),'ja',{numeric:true}) || Number(a.rank)-Number(b.rank));
+    body.innerHTML = rows.length ? rows.map(p=>`<tr><td>${esc(p.festival_title || p.festival_key || '—')}</td><td>${esc(p.team || '陣営不明')}</td><td>#${fmt(p.rank)}</td><td><span class="power-value">${fmt(p.fest_power)}</span></td></tr>`).join('') : '<tr><td colspan="4" class="empty-state">この識別子に一致するフェス順位は見つかりません。公開データに載ったフェスに限られます。</td></tr>';
+    $('player-fest-history-meta').textContent = `${rows.length.toLocaleString('ja-JP')} 件のフェス掲載記録 · 永続識別子の完全一致のみ`;
   }
 
   async function loadAllTimeRanking(force = false) {
@@ -384,12 +400,12 @@
       return;
     }
     body.innerHTML = rows.map((p,i)=>{
-      const key = String(p.player_key || '');
+      const key = nodeKey(p);
       const initials = Array.from(String(p.name || '?')).slice(0,1).join('').toUpperCase();
       const ruleLabel = RULES[p.rule]?.short || '—';
       const season = p.season ? seasonLabel(p.season) : '—';
       const observedAt = p.at ? dateLabel(p.at, true) : (p.source === 'season-endpoint' ? '日時未収録' : '—');
-      const nameNote = p.name_at_record && p.name_at_record !== p.name ? `<span class="player-small">記録時: ${esc(p.name_at_record)}</span>` : (p.name_id ? `<span class="player-small">ID ${esc(p.name_id)}</span>` : '');
+      const nameNote = p.name_at_record && p.name_at_record !== p.name ? `<span class="player-small">記録時: ${esc(p.name_at_record)}</span>` : (p.name_id ? `<span class="player-small">nameId ${esc(p.name_id)}</span>` : '');
       return `<tr><td>${rankBadge(i+1)}</td><td><button class="player-link" type="button" data-alltime-player-key="${esc(key)}" aria-label="${esc(p.name)} の履歴を表示"><span class="avatar">${esc(initials)}</span><span><span class="player-name">${esc(p.name || '名前不明')}</span>${nameNote}</span></button></td><td><span class="power-value">${fmt(p.x_power)}</span></td><td>${esc(ruleLabel)}</td><td>${esc(season)}</td><td>${p.rank_at_record ? `#${fmt(p.rank_at_record)}` : '—'}</td><td>${esc(observedAt)}</td></tr>`;
     }).join('');
     const total = Number(group?.total_players || rows.length);
@@ -497,10 +513,10 @@
       return;
     }
     body.innerHTML = rows.map((p,i) => {
-      const key = String(p.player_key || '');
+      const key = nodeKey(p);
       const initials = Array.from(String(p.name || '?')).slice(0,1).join('').toUpperCase();
       const note = [
-        p.name_id ? `<span class="player-small">ID ${esc(p.name_id)}</span>` : '',
+        p.name_id ? `<span class="player-small">nameId ${esc(p.name_id)}</span>` : '',
         `<span class="player-small">同シーズン・同ルール使用率 ${Number(p.season_usage_rate).toFixed(1)}%（${fmt(p.season_weapon_count)} / ${fmt(p.season_total_count)}記録）</span>`
       ].filter(Boolean).join('');
       const rule = RULES[p.rule]?.short || '—';
@@ -606,7 +622,7 @@
       const key = nodeKey(p), rank = Number(p.rank);
       const initials = Array.from(String(p.name || '?')).slice(0,1).join('').toUpperCase();
       const byname = typeof p.byname === 'string' ? p.byname : (p.byname?.name || '');
-      const secondary = p.name_id ? `ID ${p.name_id}` : byname;
+      const secondary = p.name_id ? `nameId ${p.name_id}` : byname;
       return `<tr><td>${rankBadge(rank)}</td><td><button class="player-link" type="button" data-player-key="${esc(key)}" aria-label="${esc(p.name)} の履歴を表示"><span class="avatar">${esc(initials)}</span><span><span class="player-name">${esc(p.name || '名前不明')}</span>${secondary ? `<span class="player-small">${esc(secondary)}</span>` : ''}</span></button></td><td><span class="power-value">${fmt(p.x_power)}</span></td><td>${rankDiff(p.rank_diff)}</td><td><span class="weapon-name">${esc(weaponJa(p.weapon))}</span></td></tr>`;
     }).join('');
   }
@@ -616,43 +632,32 @@
   async function showPlayer(key) {
     if (state.currentPage !== 'player') state.previousPage = state.currentPage || 'ranking';
     const requestedKey = String(key);
-    // Ensure the all-time X index is available before trying to connect a festival entry
-    // to its corresponding X-ranking identity.
     if (!state.allTimeIndex) await loadAllTimeRanking();
     const allKnownRows = [...state.rows, ...state.allRows, ...state.allTimeRows, ...state.festRows];
     const requestedRow = allKnownRows.find(p => nodeKey(p) === requestedKey);
     let selectedRow = requestedRow;
-    let profileKey = requestedKey;
-    if (requestedRow) {
-      const xRecord = findMatchingXPlayer(requestedRow, requestedKey);
-      if (xRecord) {
-        selectedRow = xRecord;
-        profileKey = nodeKey(xRecord);
-      } else {
-        profileKey = nodeKey(requestedRow);
-      }
+    let identity = identityKey(requestedRow) || identityValue(requestedKey);
+    if (requestedRow && identity) {
+      const xRecord = findMatchingXPlayer(requestedRow, identity);
+      if (xRecord) selectedRow = xRecord;
+      identity = identityKey(selectedRow) || identity;
     }
     const idx = await loadPlayerNameIndex();
-    // If this festival entry was not present in the current/all-time X lists, use
-    // the archive's full player-name index as a fallback join on nameId.
-    if (requestedRow && !selectedRow?.rule && !selectedRow?.season) {
-      const requestedNameId = playerNameId(requestedRow);
-      if (requestedNameId) {
-        const historyKeys = Object.entries(idx.players || {})
-          .filter(([, meta]) => String(meta?.name_id || '').trim() === requestedNameId)
-          .map(([historyKey]) => historyKey);
-        if (historyKeys.length === 1) profileKey = historyKeys[0];
-      }
-    }
-    const nameMeta = idx.players?.[profileKey] || idx.players?.[requestedKey];
-    if (!selectedRow && !nameMeta) return;
+    // Only an exact permanent identifier can connect to the indexed archive.
+    const profileKey = identity || nodeKey(selectedRow || requestedRow || {player_key: requestedKey});
+    const nameMeta = identity ? (idx.players?.[identity] || idx.players?.[profileKey]) : null;
+    if (!selectedRow && !nameMeta && !requestedRow) return;
     state.currentPlayer = {
       key: profileKey,
+      identity_key: identity,
+      player_key: identity || '',
       name:selectedRow?.name || requestedRow?.name || nameMeta?.name || '名前不明',
       name_id:playerNameId(selectedRow) || playerNameId(requestedRow) || nameMeta?.name_id || ''
     };
     $('player-title').textContent = state.currentPlayer.name;
-    $('player-meta').textContent = `統合プレイヤーID: ${profileKey}${state.currentPlayer.name_id ? ` · nameId: ${state.currentPlayer.name_id}` : ''}`;
+    $('player-meta').textContent = identity
+      ? `永続識別子: ${identity}`
+      : '永続識別子未取得 · 4桁の番号や名前では他の記録と統合しません';
     $('history-rule').value = state.selectedRule;
     $('player-panel').classList.remove('hidden');
     setActivePage('player', false);
@@ -667,6 +672,10 @@
   }
   async function renderNameHistory() {
     if (!state.currentPlayer) return;
+    if (!state.currentPlayer.identity_key) {
+      $('player-name-history').innerHTML = '<div class="player-name-entry"><div><strong>名前の履歴は未確認</strong><span class="name-period">永続識別子がないため、名前だけで過去の記録を結び付けていません。</span></div><span class="name-current">未照合</span></div>';
+      return;
+    }
     const idx = await loadPlayerNameIndex();
     const meta = idx.players?.[state.currentPlayer.key];
     const aliases = Array.isArray(meta?.names) ? [...meta.names] : [];
@@ -689,6 +698,12 @@
   async function renderArchiveHistory() {
     if (!state.currentPlayer) return;
     const host=$('archive-chart'), body=$('archive-history-body'), rule=$('history-rule').value;
+    if (!state.currentPlayer.identity_key) {
+      $('archive-history-meta').textContent='永続識別子がないため、過去アーカイブと照合していません。';
+      host.innerHTML='<div class="chart-empty">識別子がないため履歴を統合していません。</div>';
+      body.innerHTML='<tr><td colspan="6" class="empty-state">4桁の番号や名前から記録を推測することはしません。</td></tr>';
+      return;
+    }
     const idx=await loadPlayerNameIndex();
     const meta=idx.players?.[state.currentPlayer.key];
     const candidates=[];
@@ -739,6 +754,12 @@
   }
   async function renderPlayerHistory() {
     if (!state.currentPlayer) return;
+    if (!state.currentPlayer.identity_key) {
+      $('player-kpis').innerHTML = ['掲載シーズン数','最新順位','最高Xパワー','追跡期間のXP差'].map(label=>`<div class="player-kpi"><span>${label}</span><strong>—</strong></div>`).join('');
+      $('history-chart').innerHTML='<div class="chart-empty">永続識別子がないため、複数時点の記録は統合していません。</div>';
+      $('history-body').innerHTML='<tr><td colspan="5" class="empty-state">この記録の永続識別子が取得できないため、過去のXランキングとは照合していません。</td></tr>';
+      return;
+    }
     const rule = $('history-rule').value;
     await loadAllRows(rule);
     const entries = allSnapshotsFor(state.currentPlayer.key, rule);
@@ -769,6 +790,12 @@
     const host = $('hourly-chart');
     const body = $('hourly-body');
     const rule = $('history-rule').value;
+    if (!state.currentPlayer.identity_key) {
+      $('hourly-meta').textContent = '永続識別子がないため、時間別ランキングとの照合はしていません。';
+      host.innerHTML = '<div class="chart-empty">識別子がないため時間別履歴を統合していません。</div>';
+      body.innerHTML = '<tr><td colspan="4" class="empty-state">名前や4桁の番号だけでは同一人物と判定しません。</td></tr>';
+      return;
+    }
     const hindex = await loadHourlyIndex();
     const season = hindex.latest_season || state.index?.latest_season;
     const months = hindex.seasons?.[season]?.[rule] || [];
