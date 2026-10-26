@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-10-26T19:16:18Z",
+  "generated_at": "2026-10-26T23:51:27Z",
   "source": "splatoon3.ink P-season public archive-history",
   "identity_policy": "Exact player_key only; no fallback to 4-digit player ID, name, or nameId.",
   "limits": {
