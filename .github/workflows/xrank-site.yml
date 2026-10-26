@@ -63,6 +63,9 @@ jobs:
       - name: Import Japanese festival rankings and build all-time festival top 1000
         run: python scripts/import_fest_rankings.py
 
+      - name: Build all-time X power ranking (overall TOP 1500, each rule TOP 500)
+        run: python scripts/build-all-time-ranking.py
+
       - name: Set up Node.js for weapon ranking aggregation
         uses: actions/setup-node@v4
         with:

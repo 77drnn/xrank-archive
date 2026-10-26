@@ -163,3 +163,7 @@ body{background:#f4f5f7!important;font-size:13px;line-height:1.5}
   .primary-nav { order: 3; width: 100%; flex: 0 0 100%; }
   .nav-button { min-width: max-content; flex: 0 0 auto; }
 }
+
+/* Xランキング表のブキ名は、背景にかかわらず黒文字で読みやすくする */
+#ranking-body .weapon-name { color: #000000 !important; font-weight: 600; }
+.alltime-weapon { color: #344054; font-weight: 600; }

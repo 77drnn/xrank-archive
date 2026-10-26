@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" href="icon-180.png">
   <meta name="description" content="Splatoon 3のXランキング・フェスランキング・プレイヤー履歴アーカイブ">
   <title>X RANK ARCHIVE | Splatoon 3</title>
-  <link rel="stylesheet" href="style.css?v=11">
+  <link rel="stylesheet" href="style.css?v=12">
 </head>
 <body>
   <div class="app-shell">
@@ -123,16 +123,16 @@
 
       <section class="alltime-section page-view page-hidden" data-page="alltime" aria-label="全期間最高Xパワーランキング">
         <div class="alltime-card">
-          <div class="alltime-heading"><div><p class="eyebrow">ALL-TIME PERSONAL BEST</p><h2>全期間最高Xパワーランキング</h2><p class="results-subtitle">公開元に残っているPシーズン全期間のランキングを横断。各ルールはプレイヤーごとの最高記録を500人、総合は各プレイヤーの4ルール中最高XPを1件ずつ採用して1000人表示。</p></div><span id="alltime-updated" class="alltime-updated">集計データ読込待ち</span></div>
+          <div class="alltime-heading"><div><p class="eyebrow">ALL-TIME PERSONAL BEST</p><h2>全期間最高Xパワーランキング</h2><p class="results-subtitle">公開元に残っているPシーズン全期間のランキングを横断。各ルールはプレイヤーごとの最高記録を500人、総合は各プレイヤーの4ルール中最高XPを1件ずつ採用して1500人表示。</p></div><span id="alltime-updated" class="alltime-updated">集計データ読込待ち</span></div>
           <div id="alltime-tabs" class="alltime-tabs" role="group" aria-label="全期間ランキングの種類">
-            <button type="button" data-alltime-view="overall" class="alltime-tab active">総合 <span>TOP 1000</span></button>
+            <button type="button" data-alltime-view="overall" class="alltime-tab active">総合 <span>TOP 1500</span></button>
             <button type="button" data-alltime-view="splatzones" class="alltime-tab">エリア <span>TOP 500</span></button>
             <button type="button" data-alltime-view="towercontrol" class="alltime-tab">ヤグラ <span>TOP 500</span></button>
             <button type="button" data-alltime-view="rainmaker" class="alltime-tab">ホコ <span>TOP 500</span></button>
             <button type="button" data-alltime-view="clamblitz" class="alltime-tab">アサリ <span>TOP 500</span></button>
           </div>
           <p id="alltime-definition" class="alltime-definition">XPの高い順。各プレイヤーはルール別ランキングに1回、総合ランキングに最大1回だけ登場します。初回アーカイブ取り込みの進捗に応じて記録が増えます。</p>
-          <div class="table-scroll"><table class="rank-table alltime-table"><thead><tr><th class="rank-col">順位</th><th>プレイヤー</th><th class="power-col">最高X POWER</th><th>記録ルール</th><th>シーズン</th><th>当時順位</th><th>記録日時</th></tr></thead><tbody id="alltime-ranking-body"><tr><td colspan="7" class="empty-state"><span class="empty-glyph">X</span><strong>全期間ランキングを読み込んでいます</strong><p>初回収集でall-time-ranking.jsonが生成されると、最高Xパワー順に表示します。</p></td></tr></tbody></table></div>
+          <div class="table-scroll"><table class="rank-table alltime-table"><thead><tr><th class="rank-col">順位</th><th>プレイヤー</th><th class="power-col">最高X POWER</th><th>最高値達成時のブキ</th><th>記録ルール</th><th>シーズン</th><th>当時順位</th><th>記録日時</th></tr></thead><tbody id="alltime-ranking-body"><tr><td colspan="8" class="empty-state"><span class="empty-glyph">X</span><strong>全期間ランキングを読み込んでいます</strong><p>初回収集でall-time-ranking.jsonが生成されると、最高Xパワー順に表示します。</p></td></tr></tbody></table></div>
           <div class="table-footer"><span id="alltime-footer">出典：splatoon3.ink / PシーズンXランキング</span><span>プレイヤーを選ぶと履歴を表示 <b>↗</b></span></div>
         </div>
       </section>
@@ -173,7 +173,7 @@
       <footer class="footer"><div class="brand brand-footer"><span class="brand-mark">X</span><span><strong>X RANK ARCHIVE</strong><small>COMMUNITY PROJECT</small></span></div><p>非公式ファンメイドツール。任天堂およびSplatoon 3とは関係ありません。<br>取得できる範囲・項目はデータ提供元の公開状況に依存します。</p></footer>
     </main>
   </div>
-  <script src="app.js?v=14"></script>
-  <script>if ('serviceWorker' in navigator && location.protocol !== 'file:') { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js?v=13').catch(() => {})); }</script>
+  <script src="app.js?v=15"></script>
+  <script>if ('serviceWorker' in navigator && location.protocol !== 'file:') { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js?v=14').catch(() => {})); }</script>
 </body>
 </html>

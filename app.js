@@ -356,7 +356,7 @@
   async function loadAllTimeRanking(force = false) {
     if (state.allTimeIndex && !force) { renderAllTimeRanking(); return state.allTimeIndex; }
     const body = $('alltime-ranking-body');
-    if (body) body.innerHTML = '<tr><td colspan="7" class="empty-state">全期間の最高Xパワー記録を読み込んでいます…</td></tr>';
+    if (body) body.innerHTML = '<tr><td colspan="8" class="empty-state">全期間の最高Xパワー記録を読み込んでいます…</td></tr>';
     try {
       const res = await fetch(`data/all-time-ranking.json?ts=${Date.now()}`, {cache:'no-store'});
       if (!res.ok) throw new Error(`all-time-ranking.json: HTTP ${res.status}`);
@@ -371,7 +371,7 @@
       return state.allTimeIndex;
     } catch (err) {
       console.warn('All-time power rankings are not available yet', err);
-      if (body) body.innerHTML = `<tr><td colspan="7" class="empty-state"><span class="empty-glyph">X</span><strong>全期間ランキングはまだありません</strong><p>${esc(err.message)}。GitHub Actionsで初回データ取得が進み、all-time-ranking.jsonが生成されると表示されます。</p></td></tr>`;
+      if (body) body.innerHTML = `<tr><td colspan="8" class="empty-state"><span class="empty-glyph">X</span><strong>全期間ランキングはまだありません</strong><p>${esc(err.message)}。GitHub Actionsで初回データ取得が進み、all-time-ranking.jsonが生成されると表示されます。</p></td></tr>`;
       $('alltime-updated').textContent = 'データ未生成';
       $('alltime-footer').textContent = '初回のクラウド収集後に表示されます';
       return null;
@@ -385,7 +385,7 @@
     const overall = view === 'overall';
     const group = overall ? idx.overall : idx.rules?.[view];
     const rows = Array.isArray(group?.players) ? group.players : [];
-    const maxLabel = overall ? 1000 : 500;
+    const maxLabel = overall ? 1500 : 500;
     const headerName = overall ? '総合' : (RULES[view]?.ja || view);
     document.querySelectorAll('.alltime-tab').forEach(button=>button.classList.toggle('active',button.dataset.alltimeView===view));
     $('alltime-updated').textContent = idx.generated_at ? `集計 ${dateLabel(idx.generated_at, true)}` : '集計日時不明';
@@ -395,7 +395,7 @@
     $('result-count').setAttribute('aria-label','通常ランキング件数');
     const body = $('alltime-ranking-body');
     if (!rows.length) {
-      body.innerHTML = '<tr><td colspan="7" class="empty-state">まだランキング記録がありません。初回アーカイブの取り込みが進むと一覧が作られます。</td></tr>';
+      body.innerHTML = '<tr><td colspan="8" class="empty-state">まだランキング記録がありません。初回アーカイブの取り込みが進むと一覧が作られます。</td></tr>';
       $('alltime-footer').textContent = `${headerName} · 0人`;
       return;
     }
@@ -406,7 +406,7 @@
       const season = p.season ? seasonLabel(p.season) : '—';
       const observedAt = p.at ? dateLabel(p.at, true) : (p.source === 'season-endpoint' ? '日時未収録' : '—');
       const nameNote = p.name_at_record && p.name_at_record !== p.name ? `<span class="player-small">記録時: ${esc(p.name_at_record)}</span>` : (p.name_id ? `<span class="player-small">nameId ${esc(p.name_id)}</span>` : '');
-      return `<tr><td>${rankBadge(i+1)}</td><td><button class="player-link" type="button" data-alltime-player-key="${esc(key)}" aria-label="${esc(p.name)} の履歴を表示"><span class="avatar">${esc(initials)}</span><span><span class="player-name">${esc(p.name || '名前不明')}</span>${nameNote}</span></button></td><td><span class="power-value">${fmt(p.x_power)}</span></td><td>${esc(ruleLabel)}</td><td>${esc(season)}</td><td>${p.rank_at_record ? `#${fmt(p.rank_at_record)}` : '—'}</td><td>${esc(observedAt)}</td></tr>`;
+      return `<tr><td>${rankBadge(i+1)}</td><td><button class="player-link" type="button" data-alltime-player-key="${esc(key)}" aria-label="${esc(p.name)} の履歴を表示"><span class="avatar">${esc(initials)}</span><span><span class="player-name">${esc(p.name || '名前不明')}</span>${nameNote}</span></button></td><td><span class="power-value">${fmt(p.x_power)}</span></td><td><span class="weapon-name alltime-weapon">${esc(p.weapon || p.weapon_label ? weaponJa(p.weapon || p.weapon_label) : '—')}</span></td><td>${esc(ruleLabel)}</td><td>${esc(season)}</td><td>${p.rank_at_record ? `#${fmt(p.rank_at_record)}` : '—'}</td><td>${esc(observedAt)}</td></tr>`;
     }).join('');
     const total = Number(group?.total_players || rows.length);
     $('alltime-footer').textContent = `${headerName} · ${rows.length.toLocaleString('ja-JP')} / ${Math.min(maxLabel,total).toLocaleString('ja-JP')} 件表示 · 全対象 ${total.toLocaleString('ja-JP')} 人`;
