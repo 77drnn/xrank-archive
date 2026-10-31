@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-10-30T00:53:40Z",
+  "generated_at": "2026-10-31T05:29:35Z",
   "scope": "P-season X Match rankings only",
   "history_format_version": 2,
-  "days_processed": 1501,
-  "latest_archive_day": "2026-10-29",
+  "days_processed": 1502,
+  "latest_archive_day": "2026-10-30",
   "seasons": {
     "p-10": {
       "rainmaker": [
