@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-10-31T21:29:56Z",
+  "generated_at": "2026-11-01T01:06:42Z",
   "source": "splatoon3.ink P-season public archive-history",
   "identity_policy": "Exact player_key only; no fallback to 4-digit player ID, name, or nameId.",
   "limits": {
@@ -81,8 +81,8 @@
         "name_id": "2333",
         "rule": "towercontrol",
         "season": "p-17",
-        "at": "2026-10-30T13:20:26Z",
-        "date": "2026-10-30",
+        "at": "2026-10-31T00:20:26Z",
+        "date": "2026-10-31",
         "source": "archive"
       },
       {
@@ -942,7 +942,7 @@
       },
       {
         "player_key": "uid:auyij67zv6b3qtf5qnmm",
-        "name": "ティーンエイジブルー",
+        "name": "くろい　まさよし",
         "name_at_record": "9vn!☆",
         "rank": 3,
         "rank_at_record": 3,
@@ -2142,7 +2142,7 @@
       },
       {
         "player_key": "uid:qs4mhmsq5cfs7kuygpmm",
-        "name": "ながいしいな",
+        "name": "aikawa17",
         "name_at_record": "　みの",
         "rank": 11,
         "rank_at_record": 11,
@@ -3072,7 +3072,7 @@
       },
       {
         "player_key": "uid:qw5swbbonesl2dohanmm",
-        "name": "Emerald",
+        "name": "Henceforth",
         "name_at_record": "ねむα　ようつべ",
         "rank": 19,
         "rank_at_record": 19,
@@ -3807,7 +3807,7 @@
       },
       {
         "player_key": "uid:qz5twd4vm44hxad3nnmm",
-        "name": "よかったこぞプラで～",
+        "name": "にしきの まき",
         "name_at_record": "こぞプラ_ようた",
         "rank": 6,
         "rank_at_record": 6,
@@ -4851,8 +4851,8 @@
         "name_id": "2521",
         "rule": "clamblitz",
         "season": "p-17",
-        "at": "2026-10-30T17:20:24Z",
-        "date": "2026-10-30",
+        "at": "2026-10-31T00:20:21Z",
+        "date": "2026-10-31",
         "source": "archive"
       },
       {
@@ -6492,7 +6492,7 @@
       },
       {
         "player_key": "uid:qyi6tnetciafap5crnmm",
-        "name": "meltcreap",
+        "name": "めるに",
         "name_at_record": "ほしのせんし",
         "rank": 13,
         "rank_at_record": 13,
@@ -9051,8 +9051,8 @@
         "name_id": "9789",
         "rule": "towercontrol",
         "season": "p-17",
-        "at": "2026-10-30T20:20:26Z",
-        "date": "2026-10-30",
+        "at": "2026-10-31T00:20:26Z",
+        "date": "2026-10-31",
         "source": "archive"
       },
       {
@@ -10062,7 +10062,7 @@
       },
       {
         "player_key": "uid:qm6ub72jhu3nazybgnmm",
-        "name": "あ",
+        "name": "Nighthawks",
         "name_at_record": "Nighthawks",
         "rank": 20,
         "rank_at_record": 20,
@@ -10716,8 +10716,8 @@
         "name_id": "1351",
         "rule": "towercontrol",
         "season": "p-17",
-        "at": "2026-10-30T13:20:26Z",
-        "date": "2026-10-30",
+        "at": "2026-10-31T00:20:26Z",
+        "date": "2026-10-31",
         "source": "archive"
       },
       {
@@ -16497,7 +16497,7 @@
       },
       {
         "player_key": "uid:q2iti2wdok3y5gwianmm",
-        "name": "えいえんなつやすみ",
+        "name": "ひるまにきをつけて",
         "name_at_record": "aim○0brain",
         "rank": 11,
         "rank_at_record": 11,
@@ -21171,8 +21171,8 @@
         "name_id": "1411",
         "rule": "splatzones",
         "season": "p-17",
-        "at": "2026-10-30T21:20:21Z",
-        "date": "2026-10-30",
+        "at": "2026-10-31T00:20:22Z",
+        "date": "2026-10-31",
         "source": "archive"
       },
       {
@@ -23448,7 +23448,7 @@
         },
         {
           "player_key": "uid:auyij67zv6b3qtf5qnmm",
-          "name": "ティーンエイジブルー",
+          "name": "くろい　まさよし",
           "name_at_record": "aespa",
           "rank": 9,
           "rank_at_record": 9,
@@ -23853,7 +23853,7 @@
         },
         {
           "player_key": "uid:qs4mhmsq5cfs7kuygpmm",
-          "name": "ながいしいな",
+          "name": "aikawa17",
           "name_at_record": "　みの",
           "rank": 11,
           "rank_at_record": 11,
@@ -24408,7 +24408,7 @@
         },
         {
           "player_key": "uid:qw5swbbonesl2dohanmm",
-          "name": "Emerald",
+          "name": "Henceforth",
           "name_at_record": "ねむα　ようつべ",
           "rank": 19,
           "rank_at_record": 19,
@@ -26757,8 +26757,8 @@
           "name_id": "3383",
           "rule": "splatzones",
           "season": "p-17",
-          "at": "2026-10-30T00:20:25Z",
-          "date": "2026-10-30",
+          "at": "2026-10-31T00:20:22Z",
+          "date": "2026-10-31",
           "source": "archive"
         },
         {
@@ -27168,7 +27168,7 @@
         },
         {
           "player_key": "uid:qz5twd4vm44hxad3nnmm",
-          "name": "よかったこぞプラで～",
+          "name": "にしきの まき",
           "name_at_record": "ミライ☆ころちゃん∞",
           "rank": 27,
           "rank_at_record": 27,
@@ -30062,8 +30062,8 @@
           "name_id": "2333",
           "rule": "towercontrol",
           "season": "p-17",
-          "at": "2026-10-30T13:20:26Z",
-          "date": "2026-10-30",
+          "at": "2026-10-31T00:20:26Z",
+          "date": "2026-10-31",
           "source": "archive"
         },
         {
@@ -30338,7 +30338,7 @@
         },
         {
           "player_key": "uid:auyij67zv6b3qtf5qnmm",
-          "name": "ティーンエイジブルー",
+          "name": "くろい　まさよし",
           "name_at_record": "9vn!☆",
           "rank": 3,
           "rank_at_record": 3,
@@ -32288,7 +32288,7 @@
         },
         {
           "player_key": "uid:qyi6tnetciafap5crnmm",
-          "name": "meltcreap",
+          "name": "めるに",
           "name_at_record": "ヤグラホコオオカブト",
           "rank": 12,
           "rank_at_record": 12,
@@ -32882,8 +32882,8 @@
           "name_id": "9789",
           "rule": "towercontrol",
           "season": "p-17",
-          "at": "2026-10-30T20:20:26Z",
-          "date": "2026-10-30",
+          "at": "2026-10-31T00:20:26Z",
+          "date": "2026-10-31",
           "source": "archive"
         },
         {
@@ -33392,8 +33392,8 @@
           "name_id": "1351",
           "rule": "towercontrol",
           "season": "p-17",
-          "at": "2026-10-30T13:20:26Z",
-          "date": "2026-10-30",
+          "at": "2026-10-31T00:20:26Z",
+          "date": "2026-10-31",
           "source": "archive"
         },
         {
@@ -33593,7 +33593,7 @@
         },
         {
           "player_key": "uid:qz5twd4vm44hxad3nnmm",
-          "name": "よかったこぞプラで～",
+          "name": "にしきの まき",
           "name_at_record": "トドとるマン",
           "rank": 48,
           "rank_at_record": 48,
@@ -35483,7 +35483,7 @@
         },
         {
           "player_key": "uid:qm6ub72jhu3nazybgnmm",
-          "name": "あ",
+          "name": "Nighthawks",
           "name_at_record": "Décolleté",
           "rank": 21,
           "rank_at_record": 21,
@@ -39283,7 +39283,7 @@
         },
         {
           "player_key": "uid:qyi6tnetciafap5crnmm",
-          "name": "meltcreap",
+          "name": "めるに",
           "name_at_record": "ほしのせんし",
           "rank": 13,
           "rank_at_record": 13,
@@ -40123,7 +40123,7 @@
         },
         {
           "player_key": "uid:qm6ub72jhu3nazybgnmm",
-          "name": "あ",
+          "name": "Nighthawks",
           "name_at_record": "Nighthawks",
           "rank": 20,
           "rank_at_record": 20,
@@ -41398,7 +41398,7 @@
         },
         {
           "player_key": "uid:qw5swbbonesl2dohanmm",
-          "name": "Emerald",
+          "name": "Henceforth",
           "name_at_record": "ねむα",
           "rank": 20,
           "rank_at_record": 20,
@@ -42088,7 +42088,7 @@
         },
         {
           "player_key": "uid:qz5twd4vm44hxad3nnmm",
-          "name": "よかったこぞプラで～",
+          "name": "にしきの まき",
           "name_at_record": "キャベ2",
           "rank": 22,
           "rank_at_record": 22,
@@ -45603,7 +45603,7 @@
         },
         {
           "player_key": "uid:qz5twd4vm44hxad3nnmm",
-          "name": "よかったこぞプラで～",
+          "name": "にしきの まき",
           "name_at_record": "こぞプラ_ようた",
           "rank": 6,
           "rank_at_record": 6,
@@ -45867,8 +45867,8 @@
           "name_id": "2521",
           "rule": "clamblitz",
           "season": "p-17",
-          "at": "2026-10-30T17:20:24Z",
-          "date": "2026-10-30",
+          "at": "2026-10-31T00:20:21Z",
+          "date": "2026-10-31",
           "source": "archive"
         },
         {
@@ -47913,7 +47913,7 @@
         },
         {
           "player_key": "uid:q2iti2wdok3y5gwianmm",
-          "name": "えいえんなつやすみ",
+          "name": "ひるまにきをつけて",
           "name_at_record": "aim○0brain",
           "rank": 11,
           "rank_at_record": 11,
@@ -48723,7 +48723,7 @@
         },
         {
           "player_key": "uid:qw5swbbonesl2dohanmm",
-          "name": "Emerald",
+          "name": "Henceforth",
           "name_at_record": "ねむα",
           "rank": 23,
           "rank_at_record": 23,
@@ -49707,8 +49707,8 @@
           "name_id": "2925",
           "rule": "clamblitz",
           "season": "p-17",
-          "at": "2026-10-30T15:20:25Z",
-          "date": "2026-10-30",
+          "at": "2026-10-31T00:20:21Z",
+          "date": "2026-10-31",
           "source": "archive"
         },
         {
@@ -50448,7 +50448,7 @@
         },
         {
           "player_key": "uid:auyij67zv6b3qtf5qnmm",
-          "name": "ティーンエイジブルー",
+          "name": "くろい　まさよし",
           "name_at_record": "あくうせつだん",
           "rank": 26,
           "rank_at_record": 26,
@@ -50658,7 +50658,7 @@
         },
         {
           "player_key": "uid:qs4mhmsq5cfs7kuygpmm",
-          "name": "ながいしいな",
+          "name": "aikawa17",
           "name_at_record": "きっさき",
           "rank": 32,
           "rank_at_record": 32,
@@ -51228,7 +51228,7 @@
         },
         {
           "player_key": "uid:qyi6tnetciafap5crnmm",
-          "name": "meltcreap",
+          "name": "めるに",
           "name_at_record": "コーカサスオオカブト",
           "rank": 46,
           "rank_at_record": 46,
@@ -52536,7 +52536,7 @@
   },
   "stats": {
     "archive_files": 7936,
-    "valid_records": 17594155,
+    "valid_records": 17596155,
     "records_skipped_without_player_key": 0
   }
 }
