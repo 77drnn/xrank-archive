@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-11-01T01:05:12Z",
+  "generated_at": "2026-11-02T05:54:53Z",
   "scope": "P-season X Match rankings only",
   "history_format_version": 2,
-  "days_processed": 1503,
-  "latest_archive_day": "2026-10-31",
+  "days_processed": 1504,
+  "latest_archive_day": "2026-11-01",
   "seasons": {
     "p-10": {
       "rainmaker": [
@@ -290,19 +290,23 @@
     "p-17": {
       "rainmaker": [
         "2026-09",
-        "2026-10"
+        "2026-10",
+        "2026-11"
       ],
       "clamblitz": [
         "2026-09",
-        "2026-10"
+        "2026-10",
+        "2026-11"
       ],
       "splatzones": [
         "2026-09",
-        "2026-10"
+        "2026-10",
+        "2026-11"
       ],
       "towercontrol": [
         "2026-09",
-        "2026-10"
+        "2026-10",
+        "2026-11"
       ]
     },
     "p-3": {

@@ -1,19 +1,22 @@
 {
   "latest_season": "p-17",
-  "latest_snapshot_at": "2026-10-31T05:29:20Z",
+  "latest_snapshot_at": "2026-11-02T05:54:45Z",
   "seasons": {
     "p-17": {
       "splatzones": [
-        "2026-10"
+        "2026-10",
+        "2026-11"
       ],
       "towercontrol": [
         "2026-10"
       ],
       "rainmaker": [
-        "2026-10"
+        "2026-10",
+        "2026-11"
       ],
       "clamblitz": [
-        "2026-10"
+        "2026-10",
+        "2026-11"
       ]
     }
   }

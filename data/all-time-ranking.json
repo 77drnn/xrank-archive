@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-11-01T23:34:23Z",
+  "generated_at": "2026-11-02T05:56:07Z",
   "source": "splatoon3.ink P-season public archive-history",
   "identity_policy": "Exact player_key only; no fallback to 4-digit player ID, name, or nameId.",
   "limits": {
@@ -81,8 +81,8 @@
         "name_id": "2333",
         "rule": "towercontrol",
         "season": "p-17",
-        "at": "2026-10-31T00:20:26Z",
-        "date": "2026-10-31",
+        "at": "2026-11-01T00:20:28Z",
+        "date": "2026-11-01",
         "source": "archive"
       },
       {
@@ -2142,7 +2142,7 @@
       },
       {
         "player_key": "uid:qs4mhmsq5cfs7kuygpmm",
-        "name": "aikawa17",
+        "name": "ながいしいな",
         "name_at_record": "　みの",
         "rank": 11,
         "rank_at_record": 11,
@@ -2457,7 +2457,7 @@
       },
       {
         "player_key": "uid:qkbtewhrhz5ttgd4qocn",
-        "name": "ジーニアスニンフィア",
+        "name": "おいしい",
         "name_at_record": "クーゲルシュライバー",
         "rank": 9,
         "rank_at_record": 9,
@@ -4851,8 +4851,8 @@
         "name_id": "2521",
         "rule": "clamblitz",
         "season": "p-17",
-        "at": "2026-10-31T00:20:21Z",
-        "date": "2026-10-31",
+        "at": "2026-11-01T00:20:28Z",
+        "date": "2026-11-01",
         "source": "archive"
       },
       {
@@ -9051,8 +9051,8 @@
         "name_id": "9789",
         "rule": "towercontrol",
         "season": "p-17",
-        "at": "2026-10-31T00:20:26Z",
-        "date": "2026-10-31",
+        "at": "2026-11-01T00:20:28Z",
+        "date": "2026-11-01",
         "source": "archive"
       },
       {
@@ -10716,8 +10716,8 @@
         "name_id": "1351",
         "rule": "towercontrol",
         "season": "p-17",
-        "at": "2026-10-31T00:20:26Z",
-        "date": "2026-10-31",
+        "at": "2026-11-01T00:20:28Z",
+        "date": "2026-11-01",
         "source": "archive"
       },
       {
@@ -21171,8 +21171,8 @@
         "name_id": "1411",
         "rule": "splatzones",
         "season": "p-17",
-        "at": "2026-10-31T00:20:22Z",
-        "date": "2026-10-31",
+        "at": "2026-11-01T00:20:28Z",
+        "date": "2026-11-01",
         "source": "archive"
       },
       {
@@ -23853,7 +23853,7 @@
         },
         {
           "player_key": "uid:qs4mhmsq5cfs7kuygpmm",
-          "name": "aikawa17",
+          "name": "ながいしいな",
           "name_at_record": "　みの",
           "rank": 11,
           "rank_at_record": 11,
@@ -24063,7 +24063,7 @@
         },
         {
           "player_key": "uid:qkbtewhrhz5ttgd4qocn",
-          "name": "ジーニアスニンフィア",
+          "name": "おいしい",
           "name_at_record": "クーゲルシュライバー",
           "rank": 9,
           "rank_at_record": 9,
@@ -26757,8 +26757,8 @@
           "name_id": "3383",
           "rule": "splatzones",
           "season": "p-17",
-          "at": "2026-10-31T00:20:22Z",
-          "date": "2026-10-31",
+          "at": "2026-11-01T00:20:28Z",
+          "date": "2026-11-01",
           "source": "archive"
         },
         {
@@ -30062,8 +30062,8 @@
           "name_id": "2333",
           "rule": "towercontrol",
           "season": "p-17",
-          "at": "2026-10-31T00:20:26Z",
-          "date": "2026-10-31",
+          "at": "2026-11-01T00:20:28Z",
+          "date": "2026-11-01",
           "source": "archive"
         },
         {
@@ -32783,7 +32783,7 @@
         },
         {
           "player_key": "uid:qkbtewhrhz5ttgd4qocn",
-          "name": "ジーニアスニンフィア",
+          "name": "おいしい",
           "name_at_record": "クーゲルシュライバー",
           "rank": 14,
           "rank_at_record": 14,
@@ -32882,8 +32882,8 @@
           "name_id": "9789",
           "rule": "towercontrol",
           "season": "p-17",
-          "at": "2026-10-31T00:20:26Z",
-          "date": "2026-10-31",
+          "at": "2026-11-01T00:20:28Z",
+          "date": "2026-11-01",
           "source": "archive"
         },
         {
@@ -33392,8 +33392,8 @@
           "name_id": "1351",
           "rule": "towercontrol",
           "season": "p-17",
-          "at": "2026-10-31T00:20:26Z",
-          "date": "2026-10-31",
+          "at": "2026-11-01T00:20:28Z",
+          "date": "2026-11-01",
           "source": "archive"
         },
         {
@@ -45867,8 +45867,8 @@
           "name_id": "2521",
           "rule": "clamblitz",
           "season": "p-17",
-          "at": "2026-10-31T00:20:21Z",
-          "date": "2026-10-31",
+          "at": "2026-11-01T00:20:28Z",
+          "date": "2026-11-01",
           "source": "archive"
         },
         {
@@ -49707,8 +49707,8 @@
           "name_id": "2925",
           "rule": "clamblitz",
           "season": "p-17",
-          "at": "2026-10-31T00:20:21Z",
-          "date": "2026-10-31",
+          "at": "2026-11-01T00:20:28Z",
+          "date": "2026-11-01",
           "source": "archive"
         },
         {
@@ -50658,7 +50658,7 @@
         },
         {
           "player_key": "uid:qs4mhmsq5cfs7kuygpmm",
-          "name": "aikawa17",
+          "name": "ながいしいな",
           "name_at_record": "きっさき",
           "rank": 32,
           "rank_at_record": 32,
@@ -52535,8 +52535,8 @@
     }
   },
   "stats": {
-    "archive_files": 7936,
-    "valid_records": 17596155,
+    "archive_files": 8064,
+    "valid_records": 17598155,
     "records_skipped_without_player_key": 0
   }
 }
