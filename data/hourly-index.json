@@ -1,6 +1,6 @@
 {
   "latest_season": "p-17",
-  "latest_snapshot_at": "2026-11-02T05:54:45Z",
+  "latest_snapshot_at": "2026-11-02T15:40:40Z",
   "seasons": {
     "p-17": {
       "splatzones": [
@@ -8,7 +8,8 @@
         "2026-11"
       ],
       "towercontrol": [
-        "2026-10"
+        "2026-10",
+        "2026-11"
       ],
       "rainmaker": [
         "2026-10",
