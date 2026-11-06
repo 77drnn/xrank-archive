@@ -96,11 +96,16 @@ jobs:
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload site artifact
+      - name: Upload site artifact (unique per run attempt)
         uses: actions/upload-pages-artifact@v3
         with:
+          # Failed-job reruns keep artifacts from earlier attempts in the same run.
+          # Give each attempt a distinct name so deploy-pages finds exactly one.
+          name: github-pages-${{ github.run_attempt }}
           path: public
 
       - name: Publish to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
