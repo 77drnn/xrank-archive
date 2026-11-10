@@ -929,7 +929,7 @@
     else if (state.currentPage !== 'ranking') setActivePage('ranking');
     else toast('すでにランキング画面です。');
   });
-  $('reload-button').addEventListener('click',async()=>{state.dataCache.clear();state.loadedRules.clear();state.allRows=[];state.index=null;state.hourlyIndex=null;state.allTimeIndex=null;state.nameIndex=null;state.nameIndexPromise=null;state.weaponRankingRows=[];state.weaponArchiveStats=null;state.weaponArchiveLoadPromise=null;state.weaponArchiveLoadError='';await Promise.all([loadIndex(),loadAllTimeRanking(true),loadFestRankings(true)]);if(state.currentPage==='weapons')loadAllArchiveWeaponRanking(true).then(renderWeaponRanking).catch(()=>renderWeaponRanking());toast('ランキングと全期間最高Xパワーを読み直しました。');});
+  $('reload-button').addEventListener('click',async()=>{state.dataCache.clear();state.loadedRules.clear();state.allRows=[];state.index=null;state.hourlyIndex=null;state.allTimeIndex=null;state.playerBestIndex=null;state.playerBestPromise=null;state.nameIndex=null;state.nameIndexPromise=null;state.weaponRankingRows=[];state.weaponArchiveStats=null;state.weaponArchiveLoadPromise=null;state.weaponArchiveLoadError='';await Promise.all([loadIndex(),loadAllTimeRanking(true),loadFestRankings(true)]);if(state.currentPage==='weapons')loadAllArchiveWeaponRanking(true).then(renderWeaponRanking).catch(()=>renderWeaponRanking());toast('ランキングと全期間最高Xパワーを読み直しました。');});
   setActivePage('ranking', false);
   setPlayerSubpage('overview', false);
   loadIndex();
