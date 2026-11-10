@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-09T17:26:42Z",
+  "generated_at": "2026-11-10T01:29:12Z",
   "source": "https://assets.splatoon3.ink/data/xrank/",
   "scope": "X Match rankings only; no Splatfest, gear, or schedule data",
   "latest_season": "p-17",
@@ -421,11 +421,11 @@
       }
     }
   ],
-  "archive_days_processed": 1511,
+  "archive_days_processed": 1512,
   "archive_days_total": 1508,
   "archive_days_remaining": 0,
   "archive_backfill_started": true,
   "archive_backfill_complete": true,
-  "archive_latest_day": "2026-11-08",
+  "archive_latest_day": "2026-11-09",
   "failures": []
 }
