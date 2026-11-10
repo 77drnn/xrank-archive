@@ -16,6 +16,10 @@ def main() -> None:
         if not src.exists():
             raise FileNotFoundError(f"required site file missing: {src}")
         shutil.copy2(src, OUT / name)
+    best_index = ROOT / "data" / "player-best-xp.json"
+    if best_index.exists():
+        (OUT / "data").mkdir(parents=True, exist_ok=True)
+        shutil.copy2(best_index, OUT / "data" / "player-best-xp.json")
     data = ROOT / "data"
     if data.exists():
         shutil.copytree(data, OUT / "data", ignore=shutil.ignore_patterns("archive-state.json", "archive-manifest-catalog.json", "all-time-archive-max.json"))
