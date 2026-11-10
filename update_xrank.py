@@ -566,6 +566,17 @@ def build_all_time_rankings(out: Path, archive_summary: dict[str, Any] | None = 
                 if r1 < r2:
                     overall_by_player[key] = dict(record, player_key=key, rule=rule)
     overall_rows = sort_records([public_row(key, rec) for key, rec in overall_by_player.items()])
+    # Publish a compact personal-best lookup for every tracked identifier, not only TOP lists.
+    best_players = {key: public_row(key, record) for key, record in overall_by_player.items()}
+    best_candidate = {'version': ALL_TIME_RANKING_VERSION, 'generated_at': None, 'players': best_players}
+    best_target = out / 'player-best-xp.json'
+    best_old = read_json(best_target) or {}
+    best_core_old = {k:v for k,v in best_old.items() if k != 'generated_at'}
+    best_core_new = {k:v for k,v in best_candidate.items() if k != 'generated_at'}
+    best_changed = best_core_old != best_core_new
+    if best_changed:
+        best_candidate['generated_at'] = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','Z')
+        write_json(best_target, best_candidate, compact=True)
 
     state = read_json(out/'archive-state.json') or {}
     candidate = {
@@ -582,7 +593,7 @@ def build_all_time_rankings(out: Path, archive_summary: dict[str, Any] | None = 
     old_core = {k:v for k,v in old.items() if k != 'generated_at'}
     new_core = {k:v for k,v in candidate.items() if k != 'generated_at'}
     if old_core == new_core:
-        return False
+        return best_changed
     candidate['generated_at'] = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','Z')
     write_json(target, candidate, compact=True)
     return True
