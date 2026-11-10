@@ -162,6 +162,7 @@
           <button type="button" class="player-subnav-button" data-player-subnav="festivals">フェス記録</button>
         </nav>
         <div class="player-kpis player-view-section" data-player-view="overview" id="player-kpis"></div>
+        <p id="player-best-record" class="player-best-record player-view-section" data-player-view="overview">記録最高XPを読み込んでいます…</p>
         <div class="chart-card player-view-section" data-player-view="overview"><div class="chart-heading"><div><h3>シーズン別 Xパワー</h3><p>過去シーズンのランキング掲載記録。</p></div><select id="history-rule" class="field-control compact"><option value="splatzones">エリア</option><option value="towercontrol">ヤグラ</option><option value="rainmaker">ホコ</option><option value="clamblitz">アサリ</option></select></div><div id="history-chart" class="history-chart"><div class="chart-empty">プレイヤーを選択してください。</div></div></div>
         <div class="chart-card archived-history-card player-view-section player-section-hidden" data-player-view="archive"><div class="chart-heading"><div><h3>公開アーカイブの順位・XP推移</h3><p id="archive-history-meta">公開元の全アーカイブから、変化があったPシーズンの順位・XPを読み込みます。</p></div></div><div id="archive-chart" class="history-chart"><div class="chart-empty">プレイヤーを選択してください。</div></div><div class="table-scroll"><table class="history-table"><thead><tr><th>取得日</th><th>シーズン</th><th>順位</th><th>Xパワー</th><th>名前</th><th>ブキ</th></tr></thead><tbody id="archive-history-body"><tr><td colspan="6" class="empty-state">アーカイブ履歴を確認しています。</td></tr></tbody></table></div></div>
         <div class="chart-card name-history-card player-view-section player-section-hidden" data-player-view="names"><div class="chart-heading"><div><h3>過去の名前一覧</h3><p>アーカイブ内で同じプレイヤー識別子に紐づいた名前。確認された順に表示します。</p></div></div><div id="player-name-history" class="player-name-history"><div class="chart-empty">名前の履歴を読み込んでいます。</div></div></div>
@@ -173,7 +174,7 @@
       <footer class="footer"><div class="brand brand-footer"><span class="brand-mark">X</span><span><strong>X RANK ARCHIVE</strong><small>COMMUNITY PROJECT</small></span></div><p>非公式ファンメイドツール。任天堂およびSplatoon 3とは関係ありません。<br>取得できる範囲・項目はデータ提供元の公開状況に依存します。</p></footer>
     </main>
   </div>
-  <script src="app.js?v=15"></script>
+  <script src="app.js?v=16"></script>
   <script>if ('serviceWorker' in navigator && location.protocol !== 'file:') { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js?v=14').catch(() => {})); }</script>
 </body>
 </html>
