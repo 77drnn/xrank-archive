@@ -9,7 +9,7 @@
     clamblitz: { ja: 'ガチアサリ', short: 'アサリ' }
   };
   const $ = (id) => document.getElementById(id);
-  const state = { index: null, rows: [], allRows: [], currentPlayer: null, currentPage: 'ranking', previousPage: 'ranking', selectedPlayerSubpage: 'overview', selectedRule: 'splatzones', dataCache: new Map(), loadedRules: new Set(), hourlyIndex: null, nameIndex: null, nameIndexPromise: null, archiveCache: new Map(), pastNameRows: [], pastNamesVisible: 0, pastNamesLoaded: false, allTimeIndex: null, selectedAllTime: 'overall', allTimeRows: [], selectedWeaponRanking: '', weaponRankingRows: [], weaponArchiveStats: null, weaponArchiveLoadPromise: null, weaponArchiveLoadError: '', festData: null, festRows: [], selectedFestival: '', selectedFestView: 'event' };
+  const state = { index: null, rows: [], allRows: [], currentPlayer: null, currentPage: 'ranking', previousPage: 'ranking', selectedPlayerSubpage: 'overview', selectedRule: 'splatzones', dataCache: new Map(), loadedRules: new Set(), hourlyIndex: null, nameIndex: null, nameIndexPromise: null, archiveCache: new Map(), pastNameRows: [], pastNamesVisible: 0, pastNamesLoaded: false, allTimeIndex: null, selectedAllTime: 'overall', allTimeRows: [], selectedWeaponRanking: '', weaponRankingRows: [], weaponArchiveStats: null, weaponArchiveLoadPromise: null, weaponArchiveLoadError: '', festData: null, festRows: [], selectedFestival: '', selectedFestView: 'event', playerBestIndex: null, playerBestPromise: null };
   const seasonOrder = (a, b) => {
     const aa = String(a).match(/^([a-z]+)-(\d+)$/i) || ['', '', '0'];
     const bb = String(b).match(/^([a-z]+)-(\d+)$/i) || ['', '', '0'];
@@ -353,6 +353,22 @@
     $('player-fest-history-meta').textContent = `${rows.length.toLocaleString('ja-JP')} 件のフェス掲載記録 · 永続識別子の完全一致のみ`;
   }
 
+  async function loadPlayerBestIndex(force = false) {
+    if (state.playerBestIndex && !force) return state.playerBestIndex;
+    if (state.playerBestPromise && !force) return state.playerBestPromise;
+    state.playerBestPromise = (async () => {
+      try {
+        const res = await fetch(`data/player-best-xp.json?ts=${Date.now()}`, {cache:'no-store'});
+        if (!res.ok) throw new Error(`player-best-xp.json: HTTP ${res.status}`);
+        state.playerBestIndex = await res.json();
+      } catch (err) {
+        console.warn('Player personal-best index is not available', err);
+        state.playerBestIndex = {players:{}};
+      } finally { state.playerBestPromise = null; }
+      return state.playerBestIndex;
+    })();
+    return state.playerBestPromise;
+  }
   async function loadAllTimeRanking(force = false) {
     if (state.allTimeIndex && !force) { renderAllTimeRanking(); return state.allTimeIndex; }
     const body = $('alltime-ranking-body');
@@ -642,6 +658,7 @@
       if (xRecord) selectedRow = xRecord;
       identity = identityKey(selectedRow) || identity;
     }
+    await loadPlayerBestIndex();
     const idx = await loadPlayerNameIndex();
     // Only an exact permanent identifier can connect to the indexed archive.
     const profileKey = identity || nodeKey(selectedRow || requestedRow || {player_key: requestedKey});
@@ -768,9 +785,13 @@
     const bestPower = entries.reduce((v,p)=>Number.isFinite(Number(p.x_power)) ? Math.max(v,Number(p.x_power)) : v, -Infinity);
     const bestRank = entries.reduce((v,p)=>Number.isFinite(Number(p.rank)) ? Math.min(v,Number(p.rank)) : v, Infinity);
     const powerChange = first && latest && first.x_power != null && latest.x_power != null ? Number(latest.x_power)-Number(first.x_power) : null;
+    const overallBest = state.currentPlayer.identity_key ? state.playerBestIndex?.players?.[state.currentPlayer.key] : null;
+    const recordedBestPower = Number.isFinite(Number(overallBest?.x_power)) ? Number(overallBest.x_power) : (Number.isFinite(bestPower) ? bestPower : null);
+    const bestMeta = overallBest ? `${RULES[overallBest.rule]?.short || overallBest.rule || 'ルール不明'} · ${seasonLabel(overallBest.season)} · ${weaponJa(overallBest.weapon)}` : '保存済みの識別子付き記録から集計';
     $('player-kpis').innerHTML = [
-      ['掲載シーズン数',fmt(entries.length)],['最新順位',latest ? `#${fmt(latest.rank)}` : '—'],['最高Xパワー',Number.isFinite(bestPower)?fmt(bestPower):'—'],['追跡期間のXP差',powerChange==null?'—':`${powerChange>0?'+':''}${fmt(powerChange)}`]
+      ['掲載シーズン数',fmt(entries.length)],['最新順位',latest ? `#${fmt(latest.rank)}` : '—'],['記録最高Xパワー（全ルール）',recordedBestPower==null?'—':fmt(recordedBestPower)],['追跡期間のXP差',powerChange==null?'—':`${powerChange>0?'+':''}${fmt(powerChange)}`]
     ].map(([a,b])=>`<div class="player-kpi"><span>${a}</span><strong>${b}</strong></div>`).join('');
+    $('player-best-record').textContent = overallBest ? `最高値達成時：${bestMeta}` : '最高値の詳細は、次回のデータ収集後に反映されます。';
     drawChart(entries);
     $('history-body').innerHTML = entries.length ? entries.map(p=>`<tr><td>${esc(seasonLabel(p.season))}</td><td>#${fmt(p.rank)}</td><td>${fmt(p.x_power)}</td><td>${rankDiff(p.rank_diff)}</td><td>${esc(weaponJa(p.weapon))}</td></tr>`).join('') : '<tr><td colspan="5" class="empty-state">このルールの記録は見つかりません。</td></tr>';
   }
