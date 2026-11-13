@@ -1513,9 +1513,10 @@
     "2026-11-08",
     "2026-11-09",
     "2026-11-10",
-    "2026-11-11"
+    "2026-11-11",
+    "2026-11-12"
   ],
-  "latest_archive_day": "2026-11-11",
+  "latest_archive_day": "2026-11-12",
   "backfill_started": true,
   "backfill_complete": true,
   "history_format_version": 2
