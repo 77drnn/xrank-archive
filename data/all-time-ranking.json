@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-11-17T22:18:12Z",
+  "generated_at": "2026-11-18T04:15:33Z",
   "source": "splatoon3.ink P-season public archive-history",
   "identity_policy": "Exact player_key only; no fallback to 4-digit player ID, name, or nameId.",
   "limits": {
@@ -2051,6 +2051,21 @@
         "source": "archive"
       },
       {
+        "player_key": "uid:awrltkgujfdm63tseomm",
+        "name": "ちくわぷ",
+        "name_at_record": "ちくわぷ",
+        "rank": 2,
+        "rank_at_record": 2,
+        "x_power": 3626.0,
+        "weapon": "N-ZAP '85",
+        "name_id": "1351",
+        "rule": "towercontrol",
+        "season": "p-17",
+        "at": "2026-11-17T09:23:05Z",
+        "date": "2026-11-17",
+        "source": "archive"
+      },
+      {
         "player_key": "uid:atabxccbaaoq4yqhanmm",
         "name": "ふみとし",
         "name_at_record": "もろずみ！ふみとし",
@@ -2156,6 +2171,21 @@
         "source": "archive"
       },
       {
+        "player_key": "uid:qw6kajx7ygk4pd3hanmm",
+        "name": "シラネコ",
+        "name_at_record": "シラネコ",
+        "rank": 4,
+        "rank_at_record": 4,
+        "x_power": 3615.2,
+        "weapon": "N-ZAP '85",
+        "name_id": "1956",
+        "rule": "towercontrol",
+        "season": "p-17",
+        "at": "2026-11-17T16:22:46Z",
+        "date": "2026-11-17",
+        "source": "archive"
+      },
+      {
         "player_key": "uid:q6qvhxsyk5ufqgoianmm",
         "name": "わみちゅ",
         "name_at_record": "BE_わみ",
@@ -2232,7 +2262,7 @@
       },
       {
         "player_key": "uid:aci5qxobziesqlshanmm",
-        "name": "ゆるめのほいっぷー",
+        "name": "じたる・あるまる",
         "name_at_record": "じたる・あるまる",
         "rank": 4,
         "rank_at_record": 4,
@@ -2346,8 +2376,8 @@
         "name_id": "1934",
         "rule": "towercontrol",
         "season": "p-17",
-        "at": "2026-11-16T11:22:49Z",
-        "date": "2026-11-16",
+        "at": "2026-11-17T00:23:15Z",
+        "date": "2026-11-17",
         "source": "archive"
       },
       {
@@ -2816,21 +2846,6 @@
         "source": "archive"
       },
       {
-        "player_key": "uid:awrltkgujfdm63tseomm",
-        "name": "ちくわぷ",
-        "name_at_record": "ちくわぷ",
-        "rank": 3,
-        "rank_at_record": 3,
-        "x_power": 3541.0,
-        "weapon": "N-ZAP '85",
-        "name_id": "1351",
-        "rule": "towercontrol",
-        "season": "p-17",
-        "at": "2026-11-16T11:22:49Z",
-        "date": "2026-11-16",
-        "source": "archive"
-      },
-      {
         "player_key": "uid:qq6c6fqplcu3qdb24mmm",
         "name": "R.O.B.O.T",
         "name_at_record": "R.O.B.O.T",
@@ -2873,21 +2888,6 @@
         "season": "p-6",
         "at": "2024-02-09T01:21:21Z",
         "date": "2024-02-09",
-        "source": "archive"
-      },
-      {
-        "player_key": "uid:qw6kajx7ygk4pd3hanmm",
-        "name": "シラネコ",
-        "name_at_record": "シラネコ",
-        "rank": 5,
-        "rank_at_record": 5,
-        "x_power": 3538.9,
-        "weapon": "N-ZAP '85",
-        "name_id": "1956",
-        "rule": "towercontrol",
-        "season": "p-17",
-        "at": "2026-11-16T00:22:48Z",
-        "date": "2026-11-16",
         "source": "archive"
       },
       {
@@ -2937,7 +2937,7 @@
       },
       {
         "player_key": "uid:q2iztwbjjfxo5ki75dnm",
-        "name": "たかし",
+        "name": "やんよ",
         "name_at_record": "やんよ",
         "rank": 2,
         "rank_at_record": 2,
@@ -5322,7 +5322,7 @@
       },
       {
         "player_key": "uid:afddfovesrnzgqihanmm",
-        "name": "ダイナモローラー",
+        "name": "アツくもえろシウ♭",
         "name_at_record": "アツくもえろシウ♭",
         "rank": 16,
         "rank_at_record": 16,
@@ -5517,7 +5517,7 @@
       },
       {
         "player_key": "uid:apq6i2wdok3y5gvqsnmm",
-        "name": "はなび",
+        "name": "ふしぎ",
         "name_at_record": "るんるん",
         "rank": 5,
         "rank_at_record": 5,
@@ -5543,6 +5543,21 @@
         "season": "p-15",
         "at": "2026-05-25T00:20:37Z",
         "date": "2026-05-25",
+        "source": "archive"
+      },
+      {
+        "player_key": "uid:qk2e423svr7w4jxconmm",
+        "name": "wolf",
+        "name_at_record": "wolf",
+        "rank": 7,
+        "rank_at_record": 7,
+        "x_power": 3425.4,
+        "weapon": "Splatana Wiper",
+        "name_id": "4886",
+        "rule": "splatzones",
+        "season": "p-17",
+        "at": "2026-11-17T10:22:09Z",
+        "date": "2026-11-17",
         "source": "archive"
       },
       {
@@ -5831,6 +5846,21 @@
         "source": "archive"
       },
       {
+        "player_key": "uid:a5hcc7hsinmd6dcliiom",
+        "name": "さいごのアンコール",
+        "name_at_record": "さいごのアンコール",
+        "rank": 3,
+        "rank_at_record": 3,
+        "x_power": 3417.0,
+        "weapon": "Dynamo Roller",
+        "name_id": "7232",
+        "rule": "clamblitz",
+        "season": "p-17",
+        "at": "2026-11-17T03:22:39Z",
+        "date": "2026-11-17",
+        "source": "archive"
+      },
+      {
         "player_key": "uid:q5x3oyyieljlma2beomm",
         "name": "かいじゃりすいぎょ",
         "name_at_record": "かいじゃりすいぎょ",
@@ -6116,6 +6146,21 @@
         "source": "archive"
       },
       {
+        "player_key": "uid:ahei5hnfm3yy653gzzgn",
+        "name": "Lads",
+        "name_at_record": "Lads",
+        "rank": 4,
+        "rank_at_record": 4,
+        "x_power": 3408.8,
+        "weapon": "Dynamo Roller",
+        "name_id": "2342",
+        "rule": "clamblitz",
+        "season": "p-17",
+        "at": "2026-11-17T20:22:47Z",
+        "date": "2026-11-17",
+        "source": "archive"
+      },
+      {
         "player_key": "uid:a5ovhwieeknzhrhhanmm",
         "name": "ちかドラグーン",
         "name_at_record": "ちかしドラゴン",
@@ -6266,21 +6311,6 @@
         "source": "archive"
       },
       {
-        "player_key": "uid:a5hcc7hsinmd6dcliiom",
-        "name": "さいごのアンコール",
-        "name_at_record": "さいごのアンコール",
-        "rank": 2,
-        "rank_at_record": 2,
-        "x_power": 3407.0,
-        "weapon": "Dynamo Roller",
-        "name_id": "7232",
-        "rule": "clamblitz",
-        "season": "p-17",
-        "at": "2026-11-13T03:20:23Z",
-        "date": "2026-11-13",
-        "source": "archive"
-      },
-      {
         "player_key": "uid:amvhmarrn6qq454nqnmm",
         "name": "^～^",
         "name_at_record": " カルボナーラもち",
@@ -6308,21 +6338,6 @@
         "season": "p-6",
         "at": "2024-02-16T06:21:54Z",
         "date": "2024-02-16",
-        "source": "archive"
-      },
-      {
-        "player_key": "uid:qk2e423svr7w4jxconmm",
-        "name": "wolf",
-        "name_at_record": "wolf",
-        "rank": 8,
-        "rank_at_record": 8,
-        "x_power": 3405.4,
-        "weapon": "Splatana Wiper",
-        "name_id": "4886",
-        "rule": "splatzones",
-        "season": "p-17",
-        "at": "2026-11-16T21:22:16Z",
-        "date": "2026-11-16",
         "source": "archive"
       },
       {
@@ -6462,7 +6477,7 @@
       },
       {
         "player_key": "uid:q4eo4kzxkao7afb4pnmm",
-        "name": "Pick me up",
+        "name": "UNCROWNDUO",
         "name_at_record": "r",
         "rank": 19,
         "rank_at_record": 19,
@@ -7121,8 +7136,23 @@
         "source": "archive"
       },
       {
+        "player_key": "uid:qc2aiwieeknzhju2rnmm",
+        "name": "らむね*",
+        "name_at_record": "らむね*",
+        "rank": 6,
+        "rank_at_record": 6,
+        "x_power": 3379.2,
+        "weapon": ".52 Gal",
+        "name_id": "1640",
+        "rule": "clamblitz",
+        "season": "p-17",
+        "at": "2026-11-17T04:22:13Z",
+        "date": "2026-11-17",
+        "source": "archive"
+      },
+      {
         "player_key": "uid:adphz5djeix6flctynmm",
-        "name": "slimedude",
+        "name": "f1lthy",
         "name_at_record": "1of1",
         "rank": 11,
         "rank_at_record": 11,
@@ -7377,7 +7407,7 @@
       },
       {
         "player_key": "uid:a3jyskgujfdm6lxjanmm",
-        "name": "ひかみ　スミレ",
+        "name": "ことひら　なぎ",
         "name_at_record": "うみり",
         "rank": 32,
         "rank_at_record": 32,
@@ -7658,6 +7688,21 @@
         "season": "p-6",
         "at": "2024-02-27T00:21:24Z",
         "date": "2024-02-27",
+        "source": "archive"
+      },
+      {
+        "player_key": "uid:qvs35zcyukomnfdkoxan",
+        "name": "ぺろりーぬ♪",
+        "name_at_record": "ぺろりーぬ♪",
+        "rank": 8,
+        "rank_at_record": 8,
+        "x_power": 3364.8,
+        "weapon": ".52 Gal",
+        "name_id": "2924",
+        "rule": "clamblitz",
+        "season": "p-17",
+        "at": "2026-11-17T19:22:31Z",
+        "date": "2026-11-17",
         "source": "archive"
       },
       {
@@ -8306,21 +8351,6 @@
         "source": "archive"
       },
       {
-        "player_key": "uid:qvs35zcyukomnfdkoxan",
-        "name": "ぺろりーぬ♪",
-        "name_at_record": "ぺろりーぬ♪",
-        "rank": 6,
-        "rank_at_record": 6,
-        "x_power": 3349.8,
-        "weapon": ".52 Gal",
-        "name_id": "2924",
-        "rule": "clamblitz",
-        "season": "p-17",
-        "at": "2026-11-16T00:22:20Z",
-        "date": "2026-11-16",
-        "source": "archive"
-      },
-      {
         "player_key": "uid:aavcvkaf4bclqobxt4in",
         "name": "uareMyHigh",
         "name_at_record": "uareMyHigh",
@@ -8393,36 +8423,6 @@
         "season": "p-6",
         "at": "2024-02-03T15:21:13Z",
         "date": "2024-02-03",
-        "source": "archive"
-      },
-      {
-        "player_key": "uid:qc2aiwieeknzhju2rnmm",
-        "name": "らむね*",
-        "name_at_record": "らむね*",
-        "rank": 6,
-        "rank_at_record": 6,
-        "x_power": 3348.9,
-        "weapon": ".52 Gal",
-        "name_id": "1640",
-        "rule": "clamblitz",
-        "season": "p-17",
-        "at": "2026-11-11T00:20:24Z",
-        "date": "2026-11-11",
-        "source": "archive"
-      },
-      {
-        "player_key": "uid:ahei5hnfm3yy653gzzgn",
-        "name": "Lads",
-        "name_at_record": "Lads",
-        "rank": 7,
-        "rank_at_record": 7,
-        "x_power": 3348.8,
-        "weapon": "Dynamo Roller",
-        "name_id": "2342",
-        "rule": "clamblitz",
-        "season": "p-17",
-        "at": "2026-11-16T00:22:20Z",
-        "date": "2026-11-16",
         "source": "archive"
       },
       {
@@ -10106,6 +10106,21 @@
         "source": "archive"
       },
       {
+        "player_key": "uid:qh6lhvi25rorqlt64nbn",
+        "name": "メロドラマ　　",
+        "name_at_record": "メロドラマ　　",
+        "rank": 11,
+        "rank_at_record": 11,
+        "x_power": 3321.2,
+        "weapon": "Rapid Blaster Pro Deco",
+        "name_id": "8030",
+        "rule": "rainmaker",
+        "season": "p-17",
+        "at": "2026-11-17T23:22:50Z",
+        "date": "2026-11-17",
+        "source": "archive"
+      },
+      {
         "player_key": "uid:att7v4qv4dgx6zysyppm",
         "name": "あ",
         "name_at_record": "ux",
@@ -10182,7 +10197,7 @@
       },
       {
         "player_key": "uid:qm6ub72jhu3nazybgnmm",
-        "name": "あ",
+        "name": "Nighthawks",
         "name_at_record": "Nighthawks",
         "rank": 20,
         "rank_at_record": 20,
@@ -11202,7 +11217,7 @@
       },
       {
         "player_key": "uid:a4t3dimaoprqcqvianmm",
-        "name": "<【(6)】>",
+        "name": "96TVchVT",
         "name_at_record": "いわのおもさあんしん",
         "rank": 22,
         "rank_at_record": 22,
@@ -11892,7 +11907,7 @@
       },
       {
         "player_key": "uid:qh3fh33t4kj6khuhanmm",
-        "name": "たこざんぎ♭",
+        "name": "ぷかぷかシューター♭",
         "name_at_record": "Otona！",
         "rank": 53,
         "rank_at_record": 53,
@@ -12522,7 +12537,7 @@
       },
       {
         "player_key": "uid:ai6rmlx72tfeqbjusnmm",
-        "name": "ゴッドリールガン",
+        "name": "やぐちゃねるゆっくり",
         "name_at_record": "やぐ",
         "rank": 28,
         "rank_at_record": 28,
@@ -12537,7 +12552,7 @@
       },
       {
         "player_key": "uid:arvb763xiapwcsmdhpnm",
-        "name": "　　す",
+        "name": "Rainmaker",
         "name_at_record": "マリコ",
         "rank": 15,
         "rank_at_record": 15,
@@ -12777,7 +12792,7 @@
       },
       {
         "player_key": "uid:q5bhj67zv6b3qtrppnmm",
-        "name": "Audition",
+        "name": "メガリュウセイ",
         "name_at_record": "にじこいずごっど",
         "rank": 96,
         "rank_at_record": 96,
@@ -13658,21 +13673,6 @@
         "season": "p-6",
         "at": "2024-03-01T05:22:17Z",
         "date": "2024-03-01",
-        "source": "archive"
-      },
-      {
-        "player_key": "uid:qh6lhvi25rorqlt64nbn",
-        "name": "メロドラマ　　",
-        "name_at_record": "メロドラマ　　",
-        "rank": 18,
-        "rank_at_record": 18,
-        "x_power": 3271.2,
-        "weapon": "Rapid Blaster Pro Deco",
-        "name_id": "8030",
-        "rule": "rainmaker",
-        "season": "p-17",
-        "at": "2026-11-16T17:22:40Z",
-        "date": "2026-11-16",
         "source": "archive"
       },
       {
@@ -18671,6 +18671,21 @@
         "source": "archive"
       },
       {
+        "player_key": "uid:apwwpcadcx77roqtonmm",
+        "name": "かげのじつりょくしゃ",
+        "name_at_record": "かげのじつりょくしゃ",
+        "rank": 23,
+        "rank_at_record": 23,
+        "x_power": 3222.3,
+        "weapon": "Splattershot",
+        "name_id": "1891",
+        "rule": "rainmaker",
+        "season": "p-17",
+        "at": "2026-11-17T14:22:35Z",
+        "date": "2026-11-17",
+        "source": "archive"
+      },
+      {
         "player_key": "uid:aikrlc5mhuwdpnxcpmtm",
         "name": "ラグナ",
         "name_at_record": "ラグナ",
@@ -18702,7 +18717,7 @@
       },
       {
         "player_key": "uid:azjaqiurqakjnuepqnmm",
-        "name": "Failurere",
+        "name": "シュガーコート",
         "name_at_record": "ace。ぱぶろっぴ",
         "rank": 15,
         "rank_at_record": 15,
@@ -19092,7 +19107,7 @@
       },
       {
         "player_key": "uid:qn2u2rqo2v4dwvdlsnmm",
-        "name": "Jannerのれんぴ",
+        "name": "　はやし　やすのり",
         "name_at_record": "Jannerのれんぴ",
         "rank": 33,
         "rank_at_record": 33,
@@ -19887,7 +19902,7 @@
       },
       {
         "player_key": "uid:awxxtjbgz7xov6gsyqmm",
-        "name": "あ",
+        "name": "uVwXyzAcbd",
         "name_at_record": "709",
         "rank": 32,
         "rank_at_record": 32,
@@ -20168,6 +20183,21 @@
         "season": "p-17",
         "at": "2026-10-10T15:20:25Z",
         "date": "2026-10-10",
+        "source": "archive"
+      },
+      {
+        "player_key": "uid:akrripxt57ytvyvktnmm",
+        "name": "もふもふなわんくま",
+        "name_at_record": "もふもふなわんくま",
+        "rank": 18,
+        "rank_at_record": 18,
+        "x_power": 3211.2,
+        "weapon": "N-ZAP '85",
+        "name_id": "1043",
+        "rule": "clamblitz",
+        "season": "p-17",
+        "at": "2026-11-17T12:22:27Z",
+        "date": "2026-11-17",
         "source": "archive"
       },
       {
@@ -21431,6 +21461,21 @@
         "source": "archive"
       },
       {
+        "player_key": "uid:aofepa6u6is5daqo5tom",
+        "name": "さぽーにゃ",
+        "name_at_record": "さぽーにゃ",
+        "rank": 20,
+        "rank_at_record": 20,
+        "x_power": 3204.8,
+        "weapon": "Rapid Blaster Pro Deco",
+        "name_id": "2302",
+        "rule": "clamblitz",
+        "season": "p-17",
+        "at": "2026-11-17T11:22:37Z",
+        "date": "2026-11-17",
+        "source": "archive"
+      },
+      {
         "player_key": "uid:adumnjzidkilo7buvnmm",
         "name": "イエチイ",
         "name_at_record": "symB",
@@ -22436,6 +22481,21 @@
         "source": "archive"
       },
       {
+        "player_key": "uid:aepwtjbgz7xovgg7fqmm",
+        "name": "Talulah",
+        "name_at_record": "Talulah",
+        "rank": 30,
+        "rank_at_record": 30,
+        "x_power": 3198.1,
+        "weapon": "Blaster",
+        "name_id": "2858",
+        "rule": "towercontrol",
+        "season": "p-17",
+        "at": "2026-11-17T16:22:46Z",
+        "date": "2026-11-17",
+        "source": "archive"
+      },
+      {
         "player_key": "uid:q647yneoaepfbwjvtnmm",
         "name": "けがれをみそぎはらえ",
         "name_at_record": "たいこのまけんねつけ",
@@ -22449,72 +22509,12 @@
         "at": "2024-08-28T19:21:42Z",
         "date": "2024-08-28",
         "source": "archive"
-      },
-      {
-        "player_key": "uid:atu6jl3dqukskzohanmm",
-        "name": "うづきちゃああああん",
-        "name_at_record": "うづきちゃああああん",
-        "rank": 236,
-        "rank_at_record": 236,
-        "x_power": 3197.8,
-        "weapon": ".52 Gal",
-        "name_id": "1362",
-        "rule": "splatzones",
-        "season": "p-6",
-        "at": "2024-02-26T06:21:22Z",
-        "date": "2024-02-26",
-        "source": "archive"
-      },
-      {
-        "player_key": "uid:qziturd27uiwaerzo5cn",
-        "name": "しもつき　みれい",
-        "name_at_record": "しもつき　みれい",
-        "rank": 66,
-        "rank_at_record": 66,
-        "x_power": 3197.6,
-        "weapon": "Splatana Wiper",
-        "name_id": "6116",
-        "rule": "splatzones",
-        "season": "p-13",
-        "at": "2025-11-19T23:20:39Z",
-        "date": "2025-11-19",
-        "source": "archive"
-      },
-      {
-        "player_key": "uid:adp2uerpvsr4d23pcnmm",
-        "name": "あ",
-        "name_at_record": "7BANでぐち",
-        "rank": 16,
-        "rank_at_record": 16,
-        "x_power": 3197.1,
-        "weapon": "Annaki Splattershot Nova",
-        "name_id": "2458",
-        "rule": "rainmaker",
-        "season": "p-8",
-        "at": "2024-07-27T15:22:06Z",
-        "date": "2024-07-27",
-        "source": "archive"
-      },
-      {
-        "player_key": "uid:qtv32ish266yxbeopnmm",
-        "name": "どざぼしcH※ほしの",
-        "name_at_record": "LIQ　ほしのたくみ",
-        "rank": 18,
-        "rank_at_record": 18,
-        "x_power": 3197.1,
-        "weapon": ".52 Gal",
-        "name_id": "2097",
-        "rule": "clamblitz",
-        "season": "p-10",
-        "at": "2025-02-19T00:20:36Z",
-        "date": "2025-02-19",
-        "source": "archive"
       }
     ]
   },
   "rules": {
     "splatzones": {
-      "total_players": 17200,
+      "total_players": 17202,
       "players": [
         {
           "player_key": "uid:qtgromwwot2cvq5hanmm",
@@ -23883,7 +23883,7 @@
         },
         {
           "player_key": "uid:aci5qxobziesqlshanmm",
-          "name": "ゆるめのほいっぷー",
+          "name": "じたる・あるまる",
           "name_at_record": "じたる・あるまる",
           "rank": 4,
           "rank_at_record": 4,
@@ -25083,7 +25083,7 @@
         },
         {
           "player_key": "uid:q2iztwbjjfxo5ki75dnm",
-          "name": "たかし",
+          "name": "やんよ",
           "name_at_record": "やんよ",
           "rank": 8,
           "rank_at_record": 8,
@@ -26028,7 +26028,7 @@
         },
         {
           "player_key": "uid:afddfovesrnzgqihanmm",
-          "name": "ダイナモローラー",
+          "name": "アツくもえろシウ♭",
           "name_at_record": "アツくもえろシウ♭",
           "rank": 16,
           "rank_at_record": 16,
@@ -26163,7 +26163,7 @@
         },
         {
           "player_key": "uid:apq6i2wdok3y5gvqsnmm",
-          "name": "はなび",
+          "name": "ふしぎ",
           "name_at_record": "るんるん",
           "rank": 5,
           "rank_at_record": 5,
@@ -26174,6 +26174,21 @@
           "season": "p-15",
           "at": "2026-04-25T05:20:43Z",
           "date": "2026-04-25",
+          "source": "archive"
+        },
+        {
+          "player_key": "uid:qk2e423svr7w4jxconmm",
+          "name": "wolf",
+          "name_at_record": "wolf",
+          "rank": 7,
+          "rank_at_record": 7,
+          "x_power": 3425.4,
+          "weapon": "Splatana Wiper",
+          "name_id": "4886",
+          "rule": "splatzones",
+          "season": "p-17",
+          "at": "2026-11-17T10:22:09Z",
+          "date": "2026-11-17",
           "source": "archive"
         },
         {
@@ -26792,21 +26807,6 @@
           "source": "archive"
         },
         {
-          "player_key": "uid:qk2e423svr7w4jxconmm",
-          "name": "wolf",
-          "name_at_record": "wolf",
-          "rank": 8,
-          "rank_at_record": 8,
-          "x_power": 3405.4,
-          "weapon": "Splatana Wiper",
-          "name_id": "4886",
-          "rule": "splatzones",
-          "season": "p-17",
-          "at": "2026-11-16T21:22:16Z",
-          "date": "2026-11-16",
-          "source": "archive"
-        },
-        {
           "player_key": "uid:q46b7jjiicwslsd2comm",
           "name": "さようなら",
           "name_at_record": "mochi",
@@ -26883,7 +26883,7 @@
         },
         {
           "player_key": "uid:q4eo4kzxkao7afb4pnmm",
-          "name": "Pick me up",
+          "name": "UNCROWNDUO",
           "name_at_record": "r",
           "rank": 19,
           "rank_at_record": 19,
@@ -27393,7 +27393,7 @@
         },
         {
           "player_key": "uid:adphz5djeix6flctynmm",
-          "name": "slimedude",
+          "name": "f1lthy",
           "name_at_record": "1of1",
           "rank": 11,
           "rank_at_record": 11,
@@ -27558,7 +27558,7 @@
         },
         {
           "player_key": "uid:a3jyskgujfdm6lxjanmm",
-          "name": "ひかみ　スミレ",
+          "name": "ことひら　なぎ",
           "name_at_record": "うみり",
           "rank": 32,
           "rank_at_record": 32,
@@ -30847,6 +30847,21 @@
           "source": "archive"
         },
         {
+          "player_key": "uid:awrltkgujfdm63tseomm",
+          "name": "ちくわぷ",
+          "name_at_record": "ちくわぷ",
+          "rank": 2,
+          "rank_at_record": 2,
+          "x_power": 3626.0,
+          "weapon": "N-ZAP '85",
+          "name_id": "1351",
+          "rule": "towercontrol",
+          "season": "p-17",
+          "at": "2026-11-17T09:23:05Z",
+          "date": "2026-11-17",
+          "source": "archive"
+        },
+        {
           "player_key": "uid:qob6skgujfdm63coonmm",
           "name": "めめ",
           "name_at_record": "^._.^",
@@ -30904,6 +30919,21 @@
           "season": "p-14",
           "at": "2026-02-20T03:20:41Z",
           "date": "2026-02-20",
+          "source": "archive"
+        },
+        {
+          "player_key": "uid:qw6kajx7ygk4pd3hanmm",
+          "name": "シラネコ",
+          "name_at_record": "シラネコ",
+          "rank": 4,
+          "rank_at_record": 4,
+          "x_power": 3615.2,
+          "weapon": "N-ZAP '85",
+          "name_id": "1956",
+          "rule": "towercontrol",
+          "season": "p-17",
+          "at": "2026-11-17T16:22:46Z",
+          "date": "2026-11-17",
           "source": "archive"
         },
         {
@@ -31037,8 +31067,8 @@
           "name_id": "1934",
           "rule": "towercontrol",
           "season": "p-17",
-          "at": "2026-11-16T11:22:49Z",
-          "date": "2026-11-16",
+          "at": "2026-11-17T00:23:15Z",
+          "date": "2026-11-17",
           "source": "archive"
         },
         {
@@ -31117,21 +31147,6 @@
           "source": "archive"
         },
         {
-          "player_key": "uid:awrltkgujfdm63tseomm",
-          "name": "ちくわぷ",
-          "name_at_record": "ちくわぷ",
-          "rank": 3,
-          "rank_at_record": 3,
-          "x_power": 3541.0,
-          "weapon": "N-ZAP '85",
-          "name_id": "1351",
-          "rule": "towercontrol",
-          "season": "p-17",
-          "at": "2026-11-16T11:22:49Z",
-          "date": "2026-11-16",
-          "source": "archive"
-        },
-        {
           "player_key": "uid:qhtukldyq7y5tijkanmm",
           "name": "バケツ",
           "name_at_record": "ジョンジョン",
@@ -31144,21 +31159,6 @@
           "season": "p-8",
           "at": "2024-07-27T00:22:28Z",
           "date": "2024-07-27",
-          "source": "archive"
-        },
-        {
-          "player_key": "uid:qw6kajx7ygk4pd3hanmm",
-          "name": "シラネコ",
-          "name_at_record": "シラネコ",
-          "rank": 5,
-          "rank_at_record": 5,
-          "x_power": 3538.9,
-          "weapon": "N-ZAP '85",
-          "name_id": "1956",
-          "rule": "towercontrol",
-          "season": "p-17",
-          "at": "2026-11-16T00:22:48Z",
-          "date": "2026-11-16",
           "source": "archive"
         },
         {
@@ -33788,7 +33788,7 @@
         },
         {
           "player_key": "uid:a3jyskgujfdm6lxjanmm",
-          "name": "ひかみ　スミレ",
+          "name": "ことひら　なぎ",
           "name_at_record": "あのなつのひまで",
           "rank": 10,
           "rank_at_record": 10,
@@ -35123,7 +35123,7 @@
         },
         {
           "player_key": "uid:q2iztwbjjfxo5ki75dnm",
-          "name": "たかし",
+          "name": "やんよ",
           "name_at_record": "やまだでやソよ",
           "rank": 32,
           "rank_at_record": 32,
@@ -35498,7 +35498,7 @@
         },
         {
           "player_key": "uid:qm6ub72jhu3nazybgnmm",
-          "name": "あ",
+          "name": "Nighthawks",
           "name_at_record": "Décolleté",
           "rank": 21,
           "rank_at_record": 21,
@@ -36488,7 +36488,7 @@
         },
         {
           "player_key": "uid:awxxtjbgz7xov6gsyqmm",
-          "name": "あ",
+          "name": "uVwXyzAcbd",
           "name_at_record": "709",
           "rank": 32,
           "rank_at_record": 32,
@@ -37163,7 +37163,7 @@
         },
         {
           "player_key": "uid:arvb763xiapwcsmdhpnm",
-          "name": "　　す",
+          "name": "Rainmaker",
           "name_at_record": "かきおか　るい",
           "rank": 8,
           "rank_at_record": 8,
@@ -37432,6 +37432,21 @@
           "source": "archive"
         },
         {
+          "player_key": "uid:aepwtjbgz7xovgg7fqmm",
+          "name": "Talulah",
+          "name_at_record": "Talulah",
+          "rank": 30,
+          "rank_at_record": 30,
+          "x_power": 3198.1,
+          "weapon": "Blaster",
+          "name_id": "2858",
+          "rule": "towercontrol",
+          "season": "p-17",
+          "at": "2026-11-17T16:22:46Z",
+          "date": "2026-11-17",
+          "source": "archive"
+        },
+        {
           "player_key": "uid:aoz6m3jeoznmomkpxnmm",
           "name": "ようつべ　シズク",
           "name_at_record": "ジムにゃいぱーシズク",
@@ -37504,21 +37519,6 @@
           "season": "p-8",
           "at": "2024-08-25T05:22:17Z",
           "date": "2024-08-25",
-          "source": "archive"
-        },
-        {
-          "player_key": "uid:qenwpgupjqzircy2atnm",
-          "name": "rrintyasss",
-          "name_at_record": "rrintyasss",
-          "rank": 25,
-          "rank_at_record": 25,
-          "x_power": 3196.3,
-          "weapon": ".52 Gal",
-          "name_id": "3227",
-          "rule": "towercontrol",
-          "season": "p-14",
-          "at": "2026-02-17T00:20:41Z",
-          "date": "2026-02-17",
           "source": "archive"
         }
       ]
@@ -38622,6 +38622,21 @@
           "source": "archive"
         },
         {
+          "player_key": "uid:asjrh33t4kj6kpydsnmm",
+          "name": "めった",
+          "name_at_record": "めった",
+          "rank": 3,
+          "rank_at_record": 3,
+          "x_power": 3501.7,
+          "weapon": "Splattershot",
+          "name_id": "2253",
+          "rule": "rainmaker",
+          "season": "p-17",
+          "at": "2026-11-17T06:22:34Z",
+          "date": "2026-11-17",
+          "source": "archive"
+        },
+        {
           "player_key": "uid:aezzbatzqusrocyihsmm",
           "name": "ぞうしょくのあにき",
           "name_at_record": "3364あこがれ",
@@ -38634,21 +38649,6 @@
           "season": "p-13",
           "at": "2025-11-27T19:20:45Z",
           "date": "2025-11-27",
-          "source": "archive"
-        },
-        {
-          "player_key": "uid:asjrh33t4kj6kpydsnmm",
-          "name": "めった",
-          "name_at_record": "ss_めた",
-          "rank": 11,
-          "rank_at_record": 11,
-          "x_power": 3496.5,
-          "weapon": "Splattershot",
-          "name_id": "1777",
-          "rule": "rainmaker",
-          "season": "p-8",
-          "at": "2024-08-27T13:21:52Z",
-          "date": "2024-08-27",
           "source": "archive"
         },
         {
@@ -39043,7 +39043,7 @@
         },
         {
           "player_key": "uid:q2iztwbjjfxo5ki75dnm",
-          "name": "たかし",
+          "name": "やんよ",
           "name_at_record": "でやんよ",
           "rank": 9,
           "rank_at_record": 9,
@@ -40137,6 +40137,21 @@
           "source": "archive"
         },
         {
+          "player_key": "uid:qh6lhvi25rorqlt64nbn",
+          "name": "メロドラマ　　",
+          "name_at_record": "メロドラマ　　",
+          "rank": 11,
+          "rank_at_record": 11,
+          "x_power": 3321.2,
+          "weapon": "Rapid Blaster Pro Deco",
+          "name_id": "8030",
+          "rule": "rainmaker",
+          "season": "p-17",
+          "at": "2026-11-17T23:22:50Z",
+          "date": "2026-11-17",
+          "source": "archive"
+        },
+        {
           "player_key": "uid:qyukajx7ygk4ptphanmm",
           "name": "66mmks",
           "name_at_record": "え、？あー、はい。",
@@ -40153,7 +40168,7 @@
         },
         {
           "player_key": "uid:qm6ub72jhu3nazybgnmm",
-          "name": "あ",
+          "name": "Nighthawks",
           "name_at_record": "Nighthawks",
           "rank": 20,
           "rank_at_record": 20,
@@ -40408,7 +40423,7 @@
         },
         {
           "player_key": "uid:a4t3dimaoprqcqvianmm",
-          "name": "<【(6)】>",
+          "name": "96TVchVT",
           "name_at_record": "いわのおもさあんしん",
           "rank": 22,
           "rank_at_record": 22,
@@ -40678,7 +40693,7 @@
         },
         {
           "player_key": "uid:arvb763xiapwcsmdhpnm",
-          "name": "　　す",
+          "name": "Rainmaker",
           "name_at_record": "マリコ",
           "rank": 15,
           "rank_at_record": 15,
@@ -40974,21 +40989,6 @@
           "season": "p-12",
           "at": "2025-08-24T17:20:40Z",
           "date": "2025-08-24",
-          "source": "archive"
-        },
-        {
-          "player_key": "uid:qh6lhvi25rorqlt64nbn",
-          "name": "メロドラマ　　",
-          "name_at_record": "メロドラマ　　",
-          "rank": 18,
-          "rank_at_record": 18,
-          "x_power": 3271.2,
-          "weapon": "Rapid Blaster Pro Deco",
-          "name_id": "8030",
-          "rule": "rainmaker",
-          "season": "p-17",
-          "at": "2026-11-16T17:22:40Z",
-          "date": "2026-11-16",
           "source": "archive"
         },
         {
@@ -42117,6 +42117,21 @@
           "source": "archive"
         },
         {
+          "player_key": "uid:apwwpcadcx77roqtonmm",
+          "name": "かげのじつりょくしゃ",
+          "name_at_record": "かげのじつりょくしゃ",
+          "rank": 23,
+          "rank_at_record": 23,
+          "x_power": 3222.3,
+          "weapon": "Splattershot",
+          "name_id": "1891",
+          "rule": "rainmaker",
+          "season": "p-17",
+          "at": "2026-11-17T14:22:35Z",
+          "date": "2026-11-17",
+          "source": "archive"
+        },
+        {
           "player_key": "uid:aikrlc5mhuwdpnxcpmtm",
           "name": "ラグナ",
           "name_at_record": "ラグナ",
@@ -42148,7 +42163,7 @@
         },
         {
           "player_key": "uid:azjaqiurqakjnuepqnmm",
-          "name": "Failurere",
+          "name": "シュガーコート",
           "name_at_record": "ace。ぱぶろっぴ",
           "rank": 15,
           "rank_at_record": 15,
@@ -42313,7 +42328,7 @@
         },
         {
           "player_key": "uid:qn2u2rqo2v4dwvdlsnmm",
-          "name": "Jannerのれんぴ",
+          "name": "　はやし　やすのり",
           "name_at_record": "Jannerのれんぴ",
           "rank": 33,
           "rank_at_record": 33,
@@ -43153,7 +43168,7 @@
         },
         {
           "player_key": "uid:ai6rmlx72tfeqbjusnmm",
-          "name": "ゴッドリールガン",
+          "name": "やぐちゃねるゆっくり",
           "name_at_record": "あいの3てんバースト",
           "rank": 59,
           "rank_at_record": 59,
@@ -43479,6 +43494,21 @@
           "season": "p-6",
           "at": "2024-02-23T17:21:53Z",
           "date": "2024-02-23",
+          "source": "archive"
+        },
+        {
+          "player_key": "uid:arnqov76wv6n65bgupan",
+          "name": "High Noon",
+          "name_at_record": "High Noon",
+          "rank": 29,
+          "rank_at_record": 29,
+          "x_power": 3192.5,
+          "weapon": "Bulbz Tri-Stringer",
+          "name_id": "1012",
+          "rule": "rainmaker",
+          "season": "p-17",
+          "at": "2026-11-17T06:22:34Z",
+          "date": "2026-11-17",
           "source": "archive"
         },
         {
@@ -44082,21 +44112,6 @@
           "source": "archive"
         },
         {
-          "player_key": "uid:arnqov76wv6n65bgupan",
-          "name": "High Noon",
-          "name_at_record": "High Noon",
-          "rank": 28,
-          "rank_at_record": 28,
-          "x_power": 3179.3,
-          "weapon": "Bulbz Tri-Stringer",
-          "name_id": "1012",
-          "rule": "rainmaker",
-          "season": "p-17",
-          "at": "2026-11-11T15:20:22Z",
-          "date": "2026-11-11",
-          "source": "archive"
-        },
-        {
           "player_key": "uid:a3k5xpsazn3uikdhanmm",
           "name": "にゃっく",
           "name_at_record": "にゃっく",
@@ -44199,21 +44214,6 @@
           "season": "p-10",
           "at": "2025-02-26T00:20:37Z",
           "date": "2025-02-26",
-          "source": "archive"
-        },
-        {
-          "player_key": "uid:apwwpcadcx77roqtonmm",
-          "name": "かげのじつりょくしゃ",
-          "name_at_record": "かげのじつりょくしゃ",
-          "rank": 32,
-          "rank_at_record": 32,
-          "x_power": 3176.2,
-          "weapon": "S-BLAST '91",
-          "name_id": "1891",
-          "rule": "rainmaker",
-          "season": "p-16",
-          "at": "2026-08-09T09:20:40Z",
-          "date": "2026-08-09",
           "source": "archive"
         },
         {
@@ -44803,7 +44803,7 @@
         },
         {
           "player_key": "uid:awxxtjbgz7xov6gsyqmm",
-          "name": "あ",
+          "name": "uVwXyzAcbd",
           "name_at_record": "おわり",
           "rank": 13,
           "rank_at_record": 13,
@@ -45029,7 +45029,7 @@
       ]
     },
     "clamblitz": {
-      "total_players": 20380,
+      "total_players": 20381,
       "players": [
         {
           "player_key": "uid:aqzwgam6r5acpcwhanmm",
@@ -45408,7 +45408,7 @@
         },
         {
           "player_key": "uid:q2iztwbjjfxo5ki75dnm",
-          "name": "たかし",
+          "name": "やんよ",
           "name_at_record": "やんよ",
           "rank": 2,
           "rank_at_record": 2,
@@ -46097,6 +46097,21 @@
           "source": "archive"
         },
         {
+          "player_key": "uid:a5hcc7hsinmd6dcliiom",
+          "name": "さいごのアンコール",
+          "name_at_record": "さいごのアンコール",
+          "rank": 3,
+          "rank_at_record": 3,
+          "x_power": 3417.0,
+          "weapon": "Dynamo Roller",
+          "name_id": "7232",
+          "rule": "clamblitz",
+          "season": "p-17",
+          "at": "2026-11-17T03:22:39Z",
+          "date": "2026-11-17",
+          "source": "archive"
+        },
+        {
           "player_key": "uid:q5x3oyyieljlma2beomm",
           "name": "かいじゃりすいぎょ",
           "name_at_record": "かいじゃりすいぎょ",
@@ -46172,18 +46187,18 @@
           "source": "archive"
         },
         {
-          "player_key": "uid:a5hcc7hsinmd6dcliiom",
-          "name": "さいごのアンコール",
-          "name_at_record": "さいごのアンコール",
-          "rank": 2,
-          "rank_at_record": 2,
-          "x_power": 3407.0,
+          "player_key": "uid:ahei5hnfm3yy653gzzgn",
+          "name": "Lads",
+          "name_at_record": "Lads",
+          "rank": 4,
+          "rank_at_record": 4,
+          "x_power": 3408.8,
           "weapon": "Dynamo Roller",
-          "name_id": "7232",
+          "name_id": "2342",
           "rule": "clamblitz",
           "season": "p-17",
-          "at": "2026-11-13T03:20:23Z",
-          "date": "2026-11-13",
+          "at": "2026-11-17T20:22:47Z",
+          "date": "2026-11-17",
           "source": "archive"
         },
         {
@@ -46352,6 +46367,21 @@
           "source": "archive"
         },
         {
+          "player_key": "uid:qc2aiwieeknzhju2rnmm",
+          "name": "らむね*",
+          "name_at_record": "らむね*",
+          "rank": 6,
+          "rank_at_record": 6,
+          "x_power": 3379.2,
+          "weapon": ".52 Gal",
+          "name_id": "1640",
+          "rule": "clamblitz",
+          "season": "p-17",
+          "at": "2026-11-17T04:22:13Z",
+          "date": "2026-11-17",
+          "source": "archive"
+        },
+        {
           "player_key": "uid:qjkysjbgz7xovonhanmm",
           "name": "ねこ",
           "name_at_record": "ちょこ★ましゅまろ！",
@@ -46487,6 +46517,21 @@
           "source": "archive"
         },
         {
+          "player_key": "uid:qvs35zcyukomnfdkoxan",
+          "name": "ぺろりーぬ♪",
+          "name_at_record": "ぺろりーぬ♪",
+          "rank": 8,
+          "rank_at_record": 8,
+          "x_power": 3364.8,
+          "weapon": ".52 Gal",
+          "name_id": "2924",
+          "rule": "clamblitz",
+          "season": "p-17",
+          "at": "2026-11-17T19:22:31Z",
+          "date": "2026-11-17",
+          "source": "archive"
+        },
+        {
           "player_key": "uid:aoow652wr46c27stpnmm",
           "name": "こぞプラ_ざらし",
           "name_at_record": "かなたそ",
@@ -46604,51 +46649,6 @@
           "season": "p-14",
           "at": "2026-02-27T00:20:39Z",
           "date": "2026-02-27",
-          "source": "archive"
-        },
-        {
-          "player_key": "uid:qvs35zcyukomnfdkoxan",
-          "name": "ぺろりーぬ♪",
-          "name_at_record": "ぺろりーぬ♪",
-          "rank": 6,
-          "rank_at_record": 6,
-          "x_power": 3349.8,
-          "weapon": ".52 Gal",
-          "name_id": "2924",
-          "rule": "clamblitz",
-          "season": "p-17",
-          "at": "2026-11-16T00:22:20Z",
-          "date": "2026-11-16",
-          "source": "archive"
-        },
-        {
-          "player_key": "uid:qc2aiwieeknzhju2rnmm",
-          "name": "らむね*",
-          "name_at_record": "らむね*",
-          "rank": 6,
-          "rank_at_record": 6,
-          "x_power": 3348.9,
-          "weapon": ".52 Gal",
-          "name_id": "1640",
-          "rule": "clamblitz",
-          "season": "p-17",
-          "at": "2026-11-11T00:20:24Z",
-          "date": "2026-11-11",
-          "source": "archive"
-        },
-        {
-          "player_key": "uid:ahei5hnfm3yy653gzzgn",
-          "name": "Lads",
-          "name_at_record": "Lads",
-          "rank": 7,
-          "rank_at_record": 7,
-          "x_power": 3348.8,
-          "weapon": "Dynamo Roller",
-          "name_id": "2342",
-          "rule": "clamblitz",
-          "season": "p-17",
-          "at": "2026-11-16T00:22:20Z",
-          "date": "2026-11-16",
           "source": "archive"
         },
         {
@@ -47703,7 +47703,7 @@
         },
         {
           "player_key": "uid:a3jyskgujfdm6lxjanmm",
-          "name": "ひかみ　スミレ",
+          "name": "ことひら　なぎ",
           "name_at_record": "フィリアロードレイン",
           "rank": 24,
           "rank_at_record": 24,
@@ -48453,7 +48453,7 @@
         },
         {
           "player_key": "uid:a4t3dimaoprqcqvianmm",
-          "name": "<【(6)】>",
+          "name": "96TVchVT",
           "name_at_record": "いわのおもさあんしん",
           "rank": 21,
           "rank_at_record": 21,
@@ -48509,6 +48509,21 @@
           "season": "p-6",
           "at": "2024-02-13T00:21:30Z",
           "date": "2024-02-13",
+          "source": "archive"
+        },
+        {
+          "player_key": "uid:akrripxt57ytvyvktnmm",
+          "name": "もふもふなわんくま",
+          "name_at_record": "もふもふなわんくま",
+          "rank": 18,
+          "rank_at_record": 18,
+          "x_power": 3211.2,
+          "weapon": "N-ZAP '85",
+          "name_id": "1043",
+          "rule": "clamblitz",
+          "season": "p-17",
+          "at": "2026-11-17T12:22:27Z",
+          "date": "2026-11-17",
           "source": "archive"
         },
         {
@@ -48659,6 +48674,21 @@
           "season": "p-8",
           "at": "2024-08-31T17:21:44Z",
           "date": "2024-08-31",
+          "source": "archive"
+        },
+        {
+          "player_key": "uid:aofepa6u6is5daqo5tom",
+          "name": "さぽーにゃ",
+          "name_at_record": "さぽーにゃ",
+          "rank": 20,
+          "rank_at_record": 20,
+          "x_power": 3204.8,
+          "weapon": "Rapid Blaster Pro Deco",
+          "name_id": "2302",
+          "rule": "clamblitz",
+          "season": "p-17",
+          "at": "2026-11-17T11:22:37Z",
+          "date": "2026-11-17",
           "source": "archive"
         },
         {
@@ -48992,21 +49022,6 @@
           "source": "archive"
         },
         {
-          "player_key": "uid:akrripxt57ytvyvktnmm",
-          "name": "もふもふなわんくま",
-          "name_at_record": "もふもふなわんくま",
-          "rank": 19,
-          "rank_at_record": 19,
-          "x_power": 3196.2,
-          "weapon": "N-ZAP '85",
-          "name_id": "1043",
-          "rule": "clamblitz",
-          "season": "p-17",
-          "at": "2026-11-16T17:22:25Z",
-          "date": "2026-11-16",
-          "source": "archive"
-        },
-        {
           "player_key": "uid:q4lfj4kdafo5zey2onmm",
           "name": "317",
           "name_at_record": "むちさん",
@@ -49064,21 +49079,6 @@
           "season": "p-11",
           "at": "2025-05-31T03:20:44Z",
           "date": "2025-05-31",
-          "source": "archive"
-        },
-        {
-          "player_key": "uid:aofepa6u6is5daqo5tom",
-          "name": "さぽーにゃ",
-          "name_at_record": "さぽーにゃ",
-          "rank": 20,
-          "rank_at_record": 20,
-          "x_power": 3189.8,
-          "weapon": "Rapid Blaster Pro Deco",
-          "name_id": "2302",
-          "rule": "clamblitz",
-          "season": "p-17",
-          "at": "2026-11-16T17:22:25Z",
-          "date": "2026-11-16",
           "source": "archive"
         },
         {
@@ -51123,7 +51123,7 @@
         },
         {
           "player_key": "uid:arvb763xiapwcsmdhpnm",
-          "name": "　　す",
+          "name": "Rainmaker",
           "name_at_record": "マリコ",
           "rank": 31,
           "rank_at_record": 31,
@@ -51419,6 +51419,21 @@
           "season": "p-3",
           "at": "2023-08-30T23:34:53Z",
           "date": "2023-08-30",
+          "source": "archive"
+        },
+        {
+          "player_key": "uid:ac3tt3x76psxpchkvomm",
+          "name": "☆ピカチュイミー☆",
+          "name_at_record": "☆ピカチュイミー☆",
+          "rank": 33,
+          "rank_at_record": 33,
+          "x_power": 3129.6,
+          "weapon": "Sploosh-o-matic",
+          "name_id": "3233",
+          "rule": "clamblitz",
+          "season": "p-17",
+          "at": "2026-11-17T19:22:31Z",
+          "date": "2026-11-17",
           "source": "archive"
         },
         {
@@ -52487,21 +52502,6 @@
           "source": "archive"
         },
         {
-          "player_key": "uid:ac3tt3x76psxpchkvomm",
-          "name": "☆ピカチュイミー☆",
-          "name_at_record": "☆ピカチュイミー☆",
-          "rank": 29,
-          "rank_at_record": 29,
-          "x_power": 3114.6,
-          "weapon": "Sploosh-o-matic",
-          "name_id": "3233",
-          "rule": "clamblitz",
-          "season": "p-17",
-          "at": "2026-11-11T09:20:26Z",
-          "date": "2026-11-11",
-          "source": "archive"
-        },
-        {
           "player_key": "uid:qap7c6m4kmdrpj3ionmm",
           "name": "うたかたのアリア",
           "name_at_record": "いん_DT",
@@ -52536,7 +52536,7 @@
   },
   "stats": {
     "archive_files": 8064,
-    "valid_records": 17797633,
+    "valid_records": 17810438,
     "records_skipped_without_player_key": 0
   }
 }
