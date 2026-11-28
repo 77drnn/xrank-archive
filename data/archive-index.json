@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-11-27T08:16:19Z",
+  "generated_at": "2026-11-28T01:56:46Z",
   "scope": "P-season X Match rankings only",
   "history_format_version": 2,
-  "days_processed": 1529,
-  "latest_archive_day": "2026-11-26",
+  "days_processed": 1530,
+  "latest_archive_day": "2026-11-27",
   "seasons": {
     "p-10": {
       "towercontrol": [
